@@ -9,7 +9,7 @@
   "scripts": {
     "build": "rm -rf dist && webpack --config webpack.config.js",
     "watch": "tsc --watch",
-    "test": "jest",
+    "test": "echo '@vocably/auth-lambdas has no tests.'",
     "start": "npm run watch",
     "auth-lambdas": "npm start"
   },
