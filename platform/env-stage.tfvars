@@ -12,3 +12,5 @@ chrome_extension_id                       = "nomaniapkcfgfdgdadfojehechmghpgl"
 sentry_environment                        = "stage"
 alarm_email                               = "stage@vocably.pro"
 umami_website_id                          = "00593c34-002d-42f9-b128-445bdd1df6f6"
+
+email_password_auth_enabled = false

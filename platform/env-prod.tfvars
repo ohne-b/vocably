@@ -34,3 +34,7 @@ public_api_chat_with_card_throttle_rate_limit            = 30
 public_api_chat_with_card_throttle_burst_limit           = 10
 public_api_predefined_options_throttle_rate_limit        = 60
 public_api_predefined_options_throttle_burst_limit       = 10
+
+# Email + password sign-up. Turn on once this AWS account has SES production
+# access in eu-central-1; until then Cognito cannot mail unverified addresses.
+email_password_auth_enabled = false

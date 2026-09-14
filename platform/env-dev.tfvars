@@ -34,3 +34,7 @@ public_api_analyze_units_of_speech_throttle_rate_limit   = 60
 public_api_analyze_units_of_speech_throttle_burst_limit  = 60
 public_api_chat_with_card_throttle_rate_limit            = 20
 public_api_chat_with_card_throttle_burst_limit           = 20
+
+# Email + password sign-up. Off in prod until the AWS account has SES
+# production access in eu-central-1.
+email_password_auth_enabled = true
