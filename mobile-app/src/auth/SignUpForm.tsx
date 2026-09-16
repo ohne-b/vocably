@@ -43,7 +43,10 @@ export const SignUpForm: FC<Props> = ({
   const [password, setPassword] = useState('');
   const [isEmailTouched, setIsEmailTouched] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<AuthErrorCode | null>(null);
+  // Email/password errors are shown under the password field, while social
+  // sign-in errors and unrecognized ones are shown under the social buttons.
+  const [emailError, setEmailError] = useState<AuthErrorCode | null>(null);
+  const [socialError, setSocialError] = useState<AuthErrorCode | null>(null);
 
   const canSubmit = isValidEmail(email) && isPasswordValid(password);
 
@@ -53,7 +56,8 @@ export const SignUpForm: FC<Props> = ({
     }
 
     setIsSubmitting(true);
-    setError(null);
+    setEmailError(null);
+    setSocialError(null);
 
     try {
       const step = await signUpWithEmail(email, password);
@@ -66,7 +70,13 @@ export const SignUpForm: FC<Props> = ({
         popToLoginScreen(navigation);
       }
     } catch (e) {
-      setError(getAuthErrorCode(e));
+      const code = getAuthErrorCode(e);
+
+      if (code === 'unknown') {
+        setSocialError(code);
+      } else {
+        setEmailError(code);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -74,12 +84,14 @@ export const SignUpForm: FC<Props> = ({
 
   return (
     <View style={{ alignSelf: 'stretch', gap: 16 }}>
-      <AuthErrorText code={error} />
-
       <SocialSignInButtons
         disabled={loading || isSubmitting}
-        onError={setError}
+        onError={(code) => {
+          setEmailError(null);
+          setSocialError(code);
+        }}
       />
+      <AuthErrorText code={socialError} />
 
       {emailPasswordAuthEnabled && (
         <>
@@ -107,6 +119,7 @@ export const SignUpForm: FC<Props> = ({
             onSubmitEditing={submit}
           />
           <PasswordRequirements password={password} />
+          <AuthErrorText code={emailError} />
           <Button
             mode="contained"
             onPress={submit}
