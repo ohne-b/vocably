@@ -1,7 +1,9 @@
 import { AuthErrorCode } from '@vocably/sulna';
 import { ComponentProps, FC, PropsWithChildren, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { IconButton, Text, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { mainPadding } from '../styles';
@@ -18,23 +20,32 @@ export const emailInputProps = {
 
 export const AuthScrollView: FC<PropsWithChildren> = ({ children }) => {
   const insets = useSafeAreaInsets();
+  // Shrinking the scroll view's frame keeps the centered `flexGrow: 1` content
+  // sized to what's left above the keyboard. Growing it instead (keyboard
+  // content insets) leaves a keyboard-sized empty scroll below the form.
+  const headerHeight = useHeaderHeight();
 
   return (
-    <ScrollView
-      keyboardShouldPersistTaps="handled"
-      automaticallyAdjustKeyboardInsets={true}
-      contentContainerStyle={{
-        flexGrow: 1,
-        justifyContent: 'center',
-        gap: 16,
-        paddingTop: mainPadding,
-        paddingBottom: insets.bottom + mainPadding,
-        paddingLeft: insets.left + mainPadding,
-        paddingRight: insets.right + mainPadding,
-      }}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior="padding"
+      keyboardVerticalOffset={headerHeight}
     >
-      {children}
-    </ScrollView>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'center',
+          gap: 16,
+          paddingTop: mainPadding,
+          paddingBottom: insets.bottom + mainPadding,
+          paddingLeft: insets.left + mainPadding,
+          paddingRight: insets.right + mainPadding,
+        }}
+      >
+        {children}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
