@@ -2,7 +2,13 @@
 <div class="container-l bottom">
   <app-carousel></app-carousel>
 
-  <div class="text-center lead-1" style="margin-top: 2rem; margin-bottom: 2rem">
+  <!-- The scroll target is this line rather than the form itself, so that the
+       "need an account?" heading stays visible above it. -->
+  <div
+    class="text-center lead-1"
+    style="margin-top: 2rem; margin-bottom: 2rem"
+    #formAnchor
+  >
     {{ 'auth.carousel.need_account' | transloco }}
   </div>
 

@@ -1,5 +1,12 @@
 import { NgIf } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
@@ -37,8 +44,10 @@ import { CarouselComponent } from '../../carousel/carousel.component';
     CarouselComponent,
   ],
 })
-export class SignUpPageComponent implements OnInit, OnDestroy {
+export class SignUpPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private destroy$ = new Subject();
+
+  @ViewChild('formAnchor') formAnchor?: ElementRef<HTMLElement>;
 
   public wwwBaseUrl = environment.wwwBaseUrl;
 
@@ -72,6 +81,21 @@ export class SignUpPageComponent implements OnInit, OnDestroy {
     redirectError$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
       this.error = code;
     });
+  }
+
+  ngAfterViewInit(): void {
+    // The sign in page links here with #form when the visitor asked for the
+    // sign up form, which otherwise sits below the carousel, out of sight.
+    if (this.route.snapshot.fragment !== 'form') {
+      return;
+    }
+
+    setTimeout(() =>
+      this.formAnchor?.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    );
   }
 
   async submit() {

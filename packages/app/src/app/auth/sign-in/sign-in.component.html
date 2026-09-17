@@ -72,9 +72,12 @@
 
   <div class="auth-links">
     {{ 'auth.sign_in.no_account' | transloco }}
-    <a routerLink="/sign-up" [queryParams]="{ email: email || null }">{{
-      'auth.sign_in.create_account' | transloco
-    }}</a>
+    <a
+      routerLink="/sign-up"
+      [queryParams]="{ email: email || null }"
+      fragment="form"
+      >{{ 'auth.sign_in.create_account' | transloco }}</a
+    >
   </div>
 
   <div class="small text-center">
