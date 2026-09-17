@@ -56,7 +56,10 @@ export class SignUpPageComponent implements OnInit, AfterViewInit, OnDestroy {
   public showPassword = false;
   public emailTouched = false;
   public isSubmitting = false;
-  public error: AuthErrorCode | null = null;
+  // A failed Google/Apple sign-up belongs above the social buttons, an
+  // email + password failure above the submit button.
+  public socialError: AuthErrorCode | null = null;
+  public formError: AuthErrorCode | null = null;
   public authErrorKey = authErrorKey;
 
   constructor(
@@ -79,7 +82,7 @@ export class SignUpPageComponent implements OnInit, AfterViewInit, OnDestroy {
     // A Google/Apple sign-in the pre sign-up trigger refused is redirected
     // here, and the reason travels with it.
     redirectError$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
-      this.error = code;
+      this.socialError = code;
     });
   }
 
@@ -104,7 +107,7 @@ export class SignUpPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.isSubmitting = true;
-    this.error = null;
+    this.formError = null;
     redirectError$.next(null);
 
     try {
@@ -116,7 +119,7 @@ export class SignUpPageComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     } catch (error) {
-      this.error = getAuthErrorCode(error);
+      this.formError = getAuthErrorCode(error);
     } finally {
       this.isSubmitting = false;
     }

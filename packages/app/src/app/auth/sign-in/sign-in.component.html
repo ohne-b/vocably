@@ -1,7 +1,7 @@
 <div class="auth-form">
   <div class="auth-notice" *ngIf="notice">{{ notice | transloco }}</div>
-  <div class="auth-error text-danger" role="alert" *ngIf="error">
-    {{ authErrorKey(error) | transloco }}
+  <div class="auth-error text-danger" role="alert" *ngIf="socialError">
+    {{ authErrorKey(socialError) | transloco }}
   </div>
 
   <app-social-sign-in-buttons></app-social-sign-in-buttons>
@@ -58,6 +58,10 @@
         [queryParams]="{ email: email || null }"
         >{{ 'auth.sign_in.forgot_password' | transloco }}</a
       >
+    </div>
+
+    <div class="auth-error text-danger" role="alert" *ngIf="formError">
+      {{ authErrorKey(formError) | transloco }}
     </div>
 
     <button

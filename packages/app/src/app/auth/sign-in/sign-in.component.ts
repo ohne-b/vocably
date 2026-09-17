@@ -37,7 +37,10 @@ export class SignInComponent implements OnInit, OnDestroy {
   public password = '';
   public showPassword = false;
   public isSubmitting = false;
-  public error: AuthErrorCode | null = null;
+  // A failed Google/Apple sign-in belongs above the social buttons, an
+  // email + password failure above the submit button.
+  public socialError: AuthErrorCode | null = null;
+  public formError: AuthErrorCode | null = null;
   public notice: string | null = null;
   public authErrorKey = authErrorKey;
 
@@ -62,7 +65,7 @@ export class SignInComponent implements OnInit, OnDestroy {
     }
 
     redirectError$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
-      this.error = code;
+      this.socialError = code;
     });
   }
 
@@ -73,6 +76,7 @@ export class SignInComponent implements OnInit, OnDestroy {
 
     this.isSubmitting = true;
     this.notice = null;
+    this.formError = null;
     redirectError$.next(null);
 
     try {
@@ -84,7 +88,7 @@ export class SignInComponent implements OnInit, OnDestroy {
         });
       }
     } catch (error) {
-      this.error = getAuthErrorCode(error);
+      this.formError = getAuthErrorCode(error);
     } finally {
       this.isSubmitting = false;
     }
