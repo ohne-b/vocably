@@ -19,7 +19,6 @@ import {
   TermsNotice,
 } from './AuthFormParts';
 import { signUpWithEmail } from './emailAuth';
-import { emailPasswordAuthEnabled } from './emailPasswordAuthEnabled';
 import { PasswordRequirements } from './PasswordRequirements';
 import { popToLoginScreen } from './popToLoginScreen';
 import { SocialSignInButtons } from './SocialSignInButtons';
@@ -93,43 +92,39 @@ export const SignUpForm: FC<Props> = ({
       />
       <AuthErrorText code={socialError} />
 
-      {emailPasswordAuthEnabled && (
-        <>
-          <OrDivider />
-          <FormText
-            {...emailInputProps}
-            label={t('loginForm.email')}
-            value={email}
-            onChangeText={setEmail}
-            onBlur={() => setIsEmailTouched(true)}
-            returnKeyType="next"
-          />
-          {isEmailTouched && !isValidEmail(email) && (
-            <Text style={{ color: theme.colors.error }}>
-              {t('authErrors.invalidEmail')}
-            </Text>
-          )}
-          <PasswordInput
-            label={t('loginForm.password')}
-            value={password}
-            onChangeText={setPassword}
-            textContentType="newPassword"
-            autoComplete="new-password"
-            returnKeyType="go"
-            onSubmitEditing={submit}
-          />
-          <PasswordRequirements password={password} />
-          <AuthErrorText code={emailError} />
-          <Button
-            mode="contained"
-            onPress={submit}
-            loading={isSubmitting || loading}
-            disabled={!canSubmit || isSubmitting || loading}
-          >
-            {t('signUp.submit')}
-          </Button>
-        </>
+      <OrDivider />
+      <FormText
+        {...emailInputProps}
+        label={t('loginForm.email')}
+        value={email}
+        onChangeText={setEmail}
+        onBlur={() => setIsEmailTouched(true)}
+        returnKeyType="next"
+      />
+      {isEmailTouched && !isValidEmail(email) && (
+        <Text style={{ color: theme.colors.error }}>
+          {t('authErrors.invalidEmail')}
+        </Text>
       )}
+      <PasswordInput
+        label={t('loginForm.password')}
+        value={password}
+        onChangeText={setPassword}
+        textContentType="newPassword"
+        autoComplete="new-password"
+        returnKeyType="go"
+        onSubmitEditing={submit}
+      />
+      <PasswordRequirements password={password} />
+      <AuthErrorText code={emailError} />
+      <Button
+        mode="contained"
+        onPress={submit}
+        loading={isSubmitting || loading}
+        disabled={!canSubmit || isSubmitting || loading}
+      >
+        {t('signUp.submit')}
+      </Button>
 
       <Text style={{ textAlign: 'center' }}>
         {t('signUp.haveAccount')}{' '}

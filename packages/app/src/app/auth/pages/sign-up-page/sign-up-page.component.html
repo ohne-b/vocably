@@ -18,71 +18,69 @@
 
     <app-social-sign-in-buttons></app-social-sign-in-buttons>
 
-    <ng-container *ngIf="emailPasswordEnabled">
-      <div class="divider">{{ 'auth.or' | transloco }}</div>
+    <div class="divider">{{ 'auth.or' | transloco }}</div>
 
-      <form (submit)="$event.preventDefault(); submit()" novalidate>
-        <div class="field">
-          <label class="label" for="sign-up-email">{{
-            'auth.email' | transloco
-          }}</label>
+    <form (submit)="$event.preventDefault(); submit()" novalidate>
+      <div class="field">
+        <label class="label" for="sign-up-email">{{
+          'auth.email' | transloco
+        }}</label>
+        <input
+          id="sign-up-email"
+          class="form-control"
+          type="email"
+          name="email"
+          autocomplete="username"
+          inputmode="email"
+          autocapitalize="off"
+          spellcheck="false"
+          [(ngModel)]="email"
+          (blur)="emailTouched = true"
+        />
+        <div class="small text-danger" *ngIf="isEmailInvalid">
+          {{ 'auth.errors.invalid_email' | transloco }}
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="sign-up-password">{{
+          'auth.password' | transloco
+        }}</label>
+        <div class="password-field">
           <input
-            id="sign-up-email"
+            id="sign-up-password"
             class="form-control"
-            type="email"
-            name="email"
-            autocomplete="username"
-            inputmode="email"
-            autocapitalize="off"
-            spellcheck="false"
-            [(ngModel)]="email"
-            (blur)="emailTouched = true"
+            [type]="showPassword ? 'text' : 'password'"
+            name="password"
+            autocomplete="new-password"
+            [(ngModel)]="password"
           />
-          <div class="small text-danger" *ngIf="isEmailInvalid">
-            {{ 'auth.errors.invalid_email' | transloco }}
-          </div>
+          <button
+            type="button"
+            class="unstyled toggle"
+            (click)="showPassword = !showPassword"
+          >
+            {{
+              (showPassword ? 'auth.hide_password' : 'auth.show_password')
+                | transloco
+            }}
+          </button>
         </div>
+      </div>
 
-        <div class="field">
-          <label class="label" for="sign-up-password">{{
-            'auth.password' | transloco
-          }}</label>
-          <div class="password-field">
-            <input
-              id="sign-up-password"
-              class="form-control"
-              [type]="showPassword ? 'text' : 'password'"
-              name="password"
-              autocomplete="new-password"
-              [(ngModel)]="password"
-            />
-            <button
-              type="button"
-              class="unstyled toggle"
-              (click)="showPassword = !showPassword"
-            >
-              {{
-                (showPassword ? 'auth.hide_password' : 'auth.show_password')
-                  | transloco
-              }}
-            </button>
-          </div>
-        </div>
+      <app-password-requirements
+        [password]="password"
+      ></app-password-requirements>
 
-        <app-password-requirements
-          [password]="password"
-        ></app-password-requirements>
-
-        <button
-          class="button block submit"
-          type="submit"
-          [disabled]="!canSubmit || isSubmitting"
-        >
-          <ion-spinner *ngIf="isSubmitting" name="dots"></ion-spinner
-          >{{ 'auth.sign_up.submit' | transloco }}
-        </button>
-      </form>
-    </ng-container>
+      <button
+        class="button block submit"
+        type="submit"
+        [disabled]="!canSubmit || isSubmitting"
+      >
+        <ion-spinner *ngIf="isSubmitting" name="dots"></ion-spinner
+        >{{ 'auth.sign_up.submit' | transloco }}
+      </button>
+    </form>
 
     <div class="auth-links">
       {{ 'auth.sign_up.have_account' | transloco }}

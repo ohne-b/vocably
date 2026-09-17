@@ -32,7 +32,6 @@ import { SocialSignInButtonsComponent } from '../social-sign-in-buttons/social-s
 })
 export class SignInComponent implements OnInit, OnDestroy {
   public wwwBaseUrl = environment.wwwBaseUrl;
-  public emailPasswordEnabled = environment.auth.emailPasswordAuthEnabled;
 
   public email = '';
   public password = '';

@@ -18,7 +18,6 @@ import {
   TermsNotice,
 } from './AuthFormParts';
 import { signInWithEmail } from './emailAuth';
-import { emailPasswordAuthEnabled } from './emailPasswordAuthEnabled';
 import { SocialSignInButtons } from './SocialSignInButtons';
 
 type Props = {
@@ -86,61 +85,57 @@ export const LoginForm: FC<Props> = ({
       />
       <AuthErrorText code={socialError} />
 
-      {emailPasswordAuthEnabled && (
-        <>
-          <OrDivider />
-          <FormText
-            {...emailInputProps}
-            label={t('loginForm.email')}
-            value={email}
-            onChangeText={setEmail}
-            returnKeyType="next"
-          />
-          <PasswordInput
-            label={t('loginForm.password')}
-            value={password}
-            onChangeText={setPassword}
-            textContentType="password"
-            autoComplete="current-password"
-            returnKeyType="go"
-            onSubmitEditing={submit}
-          />
-          <AuthErrorText code={emailError} />
-          <Button
-            mode="contained"
-            onPress={submit}
-            loading={isSubmitting || loading}
-            disabled={!canSubmit || isSubmitting || loading}
-          >
-            {t('loginForm.submit')}
-          </Button>
-          <Button
-            mode="text"
-            onPress={() =>
-              navigation.navigate('forgotPassword', {
-                email: normalizeEmail(email),
-              })
-            }
-          >
-            {t('loginForm.forgotPassword')}
-          </Button>
-          <Text style={{ textAlign: 'center' }}>
-            {t('loginForm.noAccount')}{' '}
-            <Text
-              style={{ color: theme.colors.primary }}
-              onPress={() =>
-                onCreateAccount
-                  ? onCreateAccount(normalizeEmail(email))
-                  : navigation.navigate('signUp', {
-                      email: normalizeEmail(email),
-                    })
-              }
-            >
-              {t('loginForm.createAccount')}
-            </Text>
-          </Text>
-        </>
-      )}
+      <OrDivider />
+      <FormText
+        {...emailInputProps}
+        label={t('loginForm.email')}
+        value={email}
+        onChangeText={setEmail}
+        returnKeyType="next"
+      />
+      <PasswordInput
+        label={t('loginForm.password')}
+        value={password}
+        onChangeText={setPassword}
+        textContentType="password"
+        autoComplete="current-password"
+        returnKeyType="go"
+        onSubmitEditing={submit}
+      />
+      <AuthErrorText code={emailError} />
+      <Button
+        mode="contained"
+        onPress={submit}
+        loading={isSubmitting || loading}
+        disabled={!canSubmit || isSubmitting || loading}
+      >
+        {t('loginForm.submit')}
+      </Button>
+      <Button
+        mode="text"
+        onPress={() =>
+          navigation.navigate('forgotPassword', {
+            email: normalizeEmail(email),
+          })
+        }
+      >
+        {t('loginForm.forgotPassword')}
+      </Button>
+      <Text style={{ textAlign: 'center' }}>
+        {t('loginForm.noAccount')}{' '}
+        <Text
+          style={{ color: theme.colors.primary }}
+          onPress={() =>
+            onCreateAccount
+              ? onCreateAccount(normalizeEmail(email))
+              : navigation.navigate('signUp', {
+                  email: normalizeEmail(email),
+                })
+          }
+        >
+          {t('loginForm.createAccount')}
+        </Text>
+      </Text>
 
       <TermsNotice agreeKey="loginForm.bySigningInYouAgreeToOur" />
     </View>

@@ -265,8 +265,7 @@ resource "aws_cloudwatch_metric_alarm" "auth_pre_sign_up_error" {
 //
 // Requires the pool's email_configuration to be DEVELOPER: returning
 // emailMessage/emailSubject while the pool is on COGNITO_DEFAULT fails every
-// send with InvalidLambdaResponseException. Both are gated on
-// var.email_password_auth_enabled for that reason.
+// send with InvalidLambdaResponseException.
 
 resource "aws_iam_role" "auth_custom_message_lambda_execution" {
   name               = "vocably-${terraform.workspace}-auth_custom_message-lambda-execution"
@@ -373,22 +372,18 @@ resource "aws_cognito_user_pool" "users" {
   }
 
   admin_create_user_config {
-    allow_admin_create_user_only = !var.email_password_auth_enabled
+    allow_admin_create_user_only = false
   }
 
   // Cognito only accepts emailMessage/emailSubject from the custom message
-  // trigger when it sends through SES, so this and the trigger below are gated
-  // on the same flag.
-  dynamic "email_configuration" {
-    for_each = var.email_password_auth_enabled ? [1] : []
-
-    content {
-      email_sending_account  = "DEVELOPER"
-      source_arn             = aws_sesv2_email_identity.account.arn
-      from_email_address     = "${local.auth_from_name} <${local.auth_from_address}>"
-      reply_to_email_address = local.auth_reply_to_address
-      configuration_set      = aws_sesv2_configuration_set.account.configuration_set_name
-    }
+  // trigger when it sends through SES, which is why this is DEVELOPER rather
+  // than COGNITO_DEFAULT.
+  email_configuration {
+    email_sending_account  = "DEVELOPER"
+    source_arn             = aws_sesv2_email_identity.account.arn
+    from_email_address     = "${local.auth_from_name} <${local.auth_from_address}>"
+    reply_to_email_address = local.auth_reply_to_address
+    configuration_set      = aws_sesv2_configuration_set.account.configuration_set_name
   }
 
   verification_message_template {
@@ -414,8 +409,8 @@ resource "aws_cognito_user_pool" "users" {
 
   lambda_config {
     post_confirmation = aws_lambda_function.auth_post_confirmation.arn
-    pre_sign_up       = var.email_password_auth_enabled ? aws_lambda_function.auth_pre_sign_up.arn : null
-    custom_message    = var.email_password_auth_enabled ? aws_lambda_function.auth_custom_message.arn : null
+    pre_sign_up       = aws_lambda_function.auth_pre_sign_up.arn
+    custom_message    = aws_lambda_function.auth_custom_message.arn
   }
 
   schema {
@@ -597,7 +592,7 @@ resource "aws_cognito_user_pool_client" "client" {
   allowed_oauth_flows                  = ["code", "implicit"]
   allowed_oauth_scopes                 = ["profile", "email", "openid", "aws.cognito.signin.user.admin"]
   allowed_oauth_flows_user_pool_client = true
-  supported_identity_providers         = var.email_password_auth_enabled ? ["COGNITO", "Google", "SignInWithApple"] : ["Google", "SignInWithApple"]
+  supported_identity_providers         = ["COGNITO", "Google", "SignInWithApple"]
   depends_on                           = [aws_cognito_identity_provider.google]
 
   // Amplify v6 signIn uses SRP. Previously unset, which left the client on the

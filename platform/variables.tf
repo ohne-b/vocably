@@ -258,21 +258,3 @@ variable "google_tts_api_key" {
   type      = string
   sensitive = true
 }
-
-# Enables self-service email + password registration.
-#
-# Gates four things as a unit, because a custom message trigger that returns
-# emailMessage/emailSubject is rejected with InvalidLambdaResponseException
-# while the pool still sends through COGNITO_DEFAULT:
-#   - admin_create_user_config.allow_admin_create_user_only
-#   - aws_cognito_user_pool_client.client.supported_identity_providers
-#   - the pool's email_configuration (SES DEVELOPER sending)
-#   - the pre_sign_up and custom_message lambda triggers
-#
-# The SES identity and both lambda functions are created in every environment
-# regardless, so flipping this on is a one-line tfvars change once the AWS
-# account has SES production access in the user pool region.
-variable "email_password_auth_enabled" {
-  type    = bool
-  default = false
-}

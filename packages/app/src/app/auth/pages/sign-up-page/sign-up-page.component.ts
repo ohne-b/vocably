@@ -41,7 +41,6 @@ export class SignUpPageComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject();
 
   public wwwBaseUrl = environment.wwwBaseUrl;
-  public emailPasswordEnabled = environment.auth.emailPasswordAuthEnabled;
 
   public email = '';
   public password = '';

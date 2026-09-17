@@ -7,10 +7,8 @@
 // a sending reputation with anything a user can unsubscribe from or mark as
 // spam. A password reset that silently fails to arrive locks a user out.
 //
-// These resources are created in every environment. They stay inert until
-// var.email_password_auth_enabled points the user pool at them, and the
-// identity has to exist and pass DKIM before SES production access can even be
-// requested for the account.
+// The identity has to exist and pass DKIM before SES production access can
+// even be requested for the account.
 
 resource "aws_sesv2_email_identity" "account" {
   email_identity = local.account_domain
