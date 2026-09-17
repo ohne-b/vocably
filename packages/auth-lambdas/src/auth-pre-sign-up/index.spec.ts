@@ -1,8 +1,16 @@
-import { Context, PreSignUpTriggerEvent } from 'aws-lambda';
+import { UserType } from '@aws-sdk/client-cognito-identity-provider';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { Callback, Context, PreSignUpTriggerEvent } from 'aws-lambda';
 
-const listUsersByEmail = jest.fn();
+type ListUsersByEmail = (args: {
+  userPoolId: string;
+  email: string;
+}) => Promise<UserType[]>;
+
+const listUsersByEmail = jest.fn<ListUsersByEmail>();
 jest.mock('./listUsersByEmail', () => ({
-  listUsersByEmail: (...args: unknown[]) => listUsersByEmail(...args),
+  listUsersByEmail: (...args: Parameters<ListUsersByEmail>) =>
+    listUsersByEmail(...args),
 }));
 
 import { authPreSignUp } from './index';
@@ -28,12 +36,13 @@ const buildEvent = (
   }) as PreSignUpTriggerEvent;
 
 const invoke = async (event: PreSignUpTriggerEvent) => {
-  const callback = jest.fn();
+  const callback = jest.fn<Callback>();
   await authPreSignUp(event, {} as Context, callback);
   return callback;
 };
 
-const errorFrom = (callback: jest.Mock): Error => callback.mock.calls[0][0];
+const errorFrom = (callback: jest.Mock<Callback>): Error =>
+  callback.mock.calls[0][0] as Error;
 
 describe('authPreSignUp', () => {
   beforeEach(() => {
