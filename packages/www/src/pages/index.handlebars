@@ -1,7 +1,12 @@
 {{#> layout
   title='Language Flashcards'
   url='/'
-  hideNavBar=true
+  noCta=true
+  navbarAlwaysMurky=true
+  navbarSpacing="mb-2 mb-lg-0"
+  navbarContainerClass="container-lg"
+  nonStickyNavbar=true
+  logoClass="d-anonymous-none"
 }}
   <script type="application/ld+json">
     {
@@ -55,7 +60,7 @@
 
     @media (min-width: 768px) {
       .hero-container {
-        min-height: 600px;
+        min-height: 530px;
       }
     }
 
@@ -143,7 +148,7 @@
   <div class="hero-container">
     <div class="headline d-flex flex-column align-items-md-end justify-content-center z-1 ps-md-0">
       <div class="p-4 py-md-0 me-md-5" style="pointer-events: all">
-        <div class="mb-3">
+        <div class="mb-3 d-user-none">
           <img src="assets/logo.svg" style="height: 1.5rem;" alt="Vocably" />
         </div>
         <h1 class="headline-text gradient-headline mb-2">

@@ -277,7 +277,7 @@ const wireTranslation = (translation: HTMLVocablyTranslationElement) => {
   };
 
   const loadDeck = async () => {
-    configureDeckApi();
+    await configureDeckApi();
 
     // On a prerendered page the analysis arrives in the element's `result`
     // attribute, which the component parses in its own `connectedCallback`, so

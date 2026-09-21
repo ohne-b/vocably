@@ -8,12 +8,29 @@ import './bootstrap.scss';
 import './styles.scss';
 import { searchConfig } from './constants';
 import { words } from './search/words';
+import { isLoggedIn, onSignedIn } from './user';
 
 const browser = Bowser.getParser(window.navigator.userAgent);
 const isAndroid = browser.is('android');
 const isIos = browser.is('ios');
 const isChrome = browser.is('chrome') && !isAndroid && !isIos;
 const isSafari = browser.is('safari') && !isAndroid && !isIos;
+
+const applyCssVariables = async ({ isLoggedIn }: { isLoggedIn: boolean }) => {
+  if (isLoggedIn) {
+    document.documentElement.style.setProperty('--anonymous-display', 'block');
+    document.documentElement.style.setProperty('--user-display', 'none');
+  } else {
+    document.documentElement.style.setProperty('--anonymous-display', 'none');
+    document.documentElement.style.setProperty('--user-display', 'block');
+  }
+};
+
+isLoggedIn().then((r) =>
+  applyCssVariables({ isLoggedIn: r.success && r.value })
+);
+
+onSignedIn(() => applyCssVariables({ isLoggedIn: true }));
 
 //@ts-ignore
 window.trackEvent = track;

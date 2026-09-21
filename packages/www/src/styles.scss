@@ -18,3 +18,11 @@
 @import './styles/sections/footer.scss';
 @import './styles/sections/masthead.scss';
 @import './styles/sections/cta.scss';
+
+.d-anonymous-none {
+  display: var(--anonymous-display, none);
+}
+
+.d-user-none {
+  display: var(--user-display, none);
+}

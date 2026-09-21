@@ -157,41 +157,46 @@
         </style>
         <nav class="navbar navbar-expand-lg navbar-light{{#unless nonStickyNavbar}} sticky-menu sticky-top{{/unless}} navbar-bg px-4" style="">
           <div class="{{#if navbarContainerClass}}{{ navbarContainerClass }}{{else}}navbar-container{{/if}} p-0">
-            <a class="navbar-home-link" href="/">
+            <a class="navbar-home-link {{ logoClass }}" href="/">
               <img
                 src="assets/logo.svg"
                 alt="Vocably"
                 class="nav-logo"
               />
             </a>
-            {{#unless noCta}}
-              <div class="d-flex flex-column get-button">
-                <a
-                  href='https://chrome.google.com/webstore/detail/vocably/baocigmmhhdemijfjnjdidbkfgpgogmb'
-                  class='show-chrome btn btn-primary btn-sm rounded-pill px-5 text-sm'
-                  data-umami-event='CTA Click'
-                  data-umami-event-label='Chrome Extension'
-                >Get started</a>
-                <a
-                  href='https://apps.apple.com/app/id6464076425'
-                  class='show-safari btn btn-primary btn-sm rounded-pill px-5 text-sm'
-                  data-umami-event='CTA Click'
-                  data-umami-event-label='Safari Extension'
-                >Get started</a>
-                <a
-                  href='https://play.google.com/store/apps/details?id=com.vocablypro'
-                  class='show-android btn btn-primary btn-sm rounded-pill px-5 text-sm'
-                  data-umami-event='CTA Click'
-                  data-umami-event-label='Android app'
-                >Get started</a>
-                <a
-                  href='https://apps.apple.com/app/vocably-pro-language-cards/id1641258757'
-                  class='show-ios btn btn-primary btn-sm rounded-pill px-5 text-sm'
-                  data-umami-event='CTA Click'
-                  data-umami-event-label='iOS app'
-                >Get started</a>
+            <div class="d-flex flex-column get-button" style="margin-left: auto;">
+              {{#unless noCta}}
+                <div class="d-user-none">
+                  <a
+                    href='https://chrome.google.com/webstore/detail/vocably/baocigmmhhdemijfjnjdidbkfgpgogmb'
+                    class='show-chrome btn btn-primary btn-sm rounded-pill px-5 text-sm'
+                    data-umami-event='CTA Click'
+                    data-umami-event-label='Chrome Extension'
+                  >Get started</a>
+                  <a
+                    href='https://apps.apple.com/app/id6464076425'
+                    class='show-safari btn btn-primary btn-sm rounded-pill px-5 text-sm'
+                    data-umami-event='CTA Click'
+                    data-umami-event-label='Safari Extension'
+                  >Get started</a>
+                  <a
+                    href='https://play.google.com/store/apps/details?id=com.vocablypro'
+                    class='show-android btn btn-primary btn-sm rounded-pill px-5 text-sm'
+                    data-umami-event='CTA Click'
+                    data-umami-event-label='Android app'
+                  >Get started</a>
+                  <a
+                    href='https://apps.apple.com/app/vocably-pro-language-cards/id1641258757'
+                    class='show-ios btn btn-primary btn-sm rounded-pill px-5 text-sm'
+                    data-umami-event='CTA Click'
+                    data-umami-event-label='iOS app'
+                  >Get started</a>
+                </div>
+              {{/unless}}
+              <div class="d-anonymous-none">
+                <a href="/app" class="btn btn-primary rounded-pill" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: 1rem; --bs-btn-font-size: .75rem;">Your cards</a>
               </div>
-            {{/unless}}
+            </div>
           </div>
         </nav>
       {{/unless}}
