@@ -1,10 +1,6 @@
 export const tr = {
   // sign-in
   'sign_in.button': 'Giriş yap veya hesap oluştur',
-  'sign_in.agree': 'Giriş yaparak kabul etmiş olursunuz:',
-  'sign_in.terms': 'Kullanım Koşulları',
-  'sign_in.and': 've',
-  'sign_in.privacy': 'Gizlilik Politikası',
   // subscribe
   'subscribe.trial_message':
     'Devam etmek için 7 günlük ücretsiz deneme talep edin.',

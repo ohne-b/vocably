@@ -40,25 +40,6 @@ export class VocablySignIn {
             {t('sign_in.button')}
           </button>
         </div>
-        <div style={{ textAlign: 'center' }}>
-          {t('sign_in.agree')}{' '}
-          <a
-            class="link"
-            href="https://vocably.pro/terms-and-conditions.html"
-            target="_blank"
-          >
-            {t('sign_in.terms')}
-          </a>{' '}
-          {t('sign_in.and')}{' '}
-          <a
-            class="link"
-            href="https://vocably.pro/privacy-policy.html"
-            target="_blank"
-          >
-            {t('sign_in.privacy')}
-          </a>
-          .
-        </div>
       </Host>
     );
   }

@@ -1,10 +1,6 @@
 export const vi = {
   // sign-in
   'sign_in.button': 'Đăng nhập hoặc tạo tài khoản',
-  'sign_in.agree': 'Khi đăng nhập, bạn đồng ý với',
-  'sign_in.terms': 'Điều khoản dịch vụ',
-  'sign_in.and': 'và',
-  'sign_in.privacy': 'Chính sách bảo mật',
   // subscribe
   'subscribe.trial_message': 'Yêu cầu dùng thử miễn phí 7 ngày để tiếp tục.',
   'subscribe.message': 'Vui lòng đăng ký để tiếp tục.',

@@ -1,10 +1,6 @@
 export const uk = {
   // sign-in
   'sign_in.button': 'Увійти або створити акаунт',
-  'sign_in.agree': 'Входячи, ви погоджуєтесь з нашими',
-  'sign_in.terms': 'Умовами використання',
-  'sign_in.and': 'та',
-  'sign_in.privacy': 'Політикою конфіденційності',
   // subscribe
   'subscribe.trial_message':
     'Запитайте 7-денний безкоштовний пробний період, щоб продовжити.',

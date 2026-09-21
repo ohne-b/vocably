@@ -1,10 +1,6 @@
 export const ru = {
   // sign-in
   'sign_in.button': 'Войти или создать аккаунт',
-  'sign_in.agree': 'Входя, вы соглашаетесь с нашими',
-  'sign_in.terms': 'Условиями использования',
-  'sign_in.and': 'и',
-  'sign_in.privacy': 'Политикой конфиденциальности',
   // subscribe
   'subscribe.trial_message':
     'Запросите бесплатный пробный период на 7 дней, чтобы продолжить.',

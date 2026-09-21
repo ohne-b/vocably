@@ -1,10 +1,6 @@
 export const pt = {
   // sign-in
   'sign_in.button': 'Entrar ou criar uma conta',
-  'sign_in.agree': 'Ao entrar, você concorda com nossos',
-  'sign_in.terms': 'Termos de Serviço',
-  'sign_in.and': 'e',
-  'sign_in.privacy': 'Política de Privacidade',
   // subscribe
   'subscribe.trial_message':
     'Solicite um período de teste gratuito de 7 dias para continuar.',
