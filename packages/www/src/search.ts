@@ -1,10 +1,12 @@
 import { defineCustomElements } from '@vocably/extension-content-ui/loader';
 import { SearchValues } from '@vocably/extension-content-ui/src/components/search-form/types';
 import {
+  AddCardPayload,
   Analysis,
   AnalyzePayload,
   GoogleLanguage,
   isGoogleLanguage,
+  RemoveCardPayload,
   Result,
   TranslationCards,
 } from '@vocably/model';
@@ -15,6 +17,18 @@ import { playAudioPronunciation } from './search/playAudioPronunciation';
 import { searchConfig } from './constants';
 
 import posthog from 'posthog-js';
+import { loadLanguageDeck } from '@vocably/api';
+import {
+  addCard,
+  attachTag,
+  deleteTag,
+  detachTag,
+  removeCard,
+  updateCard,
+  updateTag,
+} from './search/deck';
+import { getCardsLimit } from './search/cardsLimit';
+import { configureDeckApi, isLoggedIn, onSignedIn } from './user';
 
 posthog.init('phc_zSkRhQ7tE4RDFRdxIVXzWwJ66ACL9QAHnyrRpRknyHj', {
   api_host: 'https://api-e.vocably.pro',
@@ -164,12 +178,167 @@ if (!existingResultsContainer) {
   searchContainer.appendChild(resultsContainer);
 }
 
-const onLearn = (event) => {
-  posthog.capture('search-learn-clicked', {
-    ...event.detail.card.data,
-  });
+const signInUrl = '/app/hands-free';
+
+/**
+ * The congratulation shown after the very first added card is a one time thing,
+ * so a flag in the local storage remembers that the visitor has already been
+ * through it.
+ */
+const knowsHowToAdd = (): boolean =>
+  localStorage.getItem(searchConfig.knowsHowToAddLocalStorageKey) !== null;
+
+const rememberKnowsHowToAdd = () => {
+  localStorage.setItem(searchConfig.knowsHowToAddLocalStorageKey, 'true');
+};
+
+/**
+ * Turns a `vocably-translation` element into a real deck client: the tag
+ * callbacks, the add and remove handlers, and the signed in state the component
+ * uses to decide between adding a card and offering to sign in.
+ *
+ * Shared by the element created after a live search and the prerendered one the
+ * SEO pages ship with.
+ */
+const wireTranslation = (translation: HTMLVocablyTranslationElement) => {
+  // These hand back the updated deck, which the component applies to itself.
+  translation.updateCard = updateCard;
+  translation.attachTag = attachTag;
+  translation.detachTag = detachTag;
+  translation.updateTag = updateTag;
+  translation.deleteTag = deleteTag;
+
+  translation.paymentLink = '/app/subscribe';
+
+  translation.canCongratulate = !knowsHowToAdd();
+
+  // Which cards are already in the collection is only known once the deck has
+  // been loaded, so the add and remove buttons stay hidden until then. Without
+  // it a card the visitor already has flashes a Learn button first.
+  translation.hideActions = true;
+
+  // Adding and removing are events rather than callbacks, so the result has to
+  // be put back onto the element here.
   // @ts-ignore
-  new bootstrap.Modal(document.getElementById('myModal')).show();
+  translation.addEventListener(
+    'addCard',
+    async ({ detail: payload }: CustomEvent<AddCardPayload>) => {
+      posthog.capture('search-learn-clicked', {
+        ...payload.card.data,
+      });
+
+      translation.isUpdating = payload.card;
+      const result = await addCard(payload);
+      translation.result = result;
+      translation.isUpdating = null;
+
+      // The congratulation is rendered by this very element, so the flag only
+      // keeps the next lookup from congratulating again.
+      if (result.success === true) {
+        rememberKnowsHowToAdd();
+      }
+    }
+  );
+
+  // @ts-ignore
+  translation.addEventListener(
+    'removeCard',
+    async ({ detail: payload }: CustomEvent<RemoveCardPayload>) => {
+      translation.isUpdating = payload.card;
+      translation.result = await removeCard(payload);
+      translation.isUpdating = null;
+    }
+  );
+
+  // Emitted by `vocably-sign-in` inside the sign in cover. Signing in happens
+  // in the app, so this page keeps the looked up word on screen and picks the
+  // session up when the visitor returns to the tab.
+  translation.addEventListener('confirm', () => {
+    window.open(signInUrl, '_blank')?.focus();
+  });
+
+  // On a prerendered page this element is wired long before its implementation
+  // chunk has loaded. Stencil replays the properties set on it while it was
+  // still a plain element, but the component's own `connectedCallback` then
+  // re-reads `result`, `isLightweight`, `showLanguages` and `hideActions` from
+  // the attributes the page was rendered with and overwrites them. So anything
+  // that has to survive is applied only once the component is up - waiting for
+  // the tag to be defined is not enough, the definition lands before the chunk.
+  const componentReady = customElements
+    .whenDefined('vocably-translation')
+    .then(() => translation.componentOnReady());
+
+  // Reveals the add and remove buttons the wiring above hid. Deferred for the
+  // same reason: the prerendered element carries `hideActions="true"`, which
+  // `connectedCallback` would otherwise apply on top of this.
+  const showActions = async () => {
+    await componentReady;
+    translation.hideActions = false;
+  };
+
+  const loadDeck = async () => {
+    configureDeckApi();
+
+    // On a prerendered page the analysis arrives in the element's `result`
+    // attribute, which the component parses in its own `connectedCallback`, so
+    // reading it any earlier would find nothing: no deck would be fetched and
+    // every card would look addable.
+    await componentReady;
+
+    const result = translation.result;
+
+    if (!result || result.success === false) {
+      return;
+    }
+
+    const [deckResult, cardsLimit] = await Promise.all([
+      loadLanguageDeck(result.value.sourceLanguage),
+      getCardsLimit(),
+    ]);
+
+    translation.cardsLimit = cardsLimit;
+
+    if (deckResult.success === false) {
+      return;
+    }
+
+    // A new search may have replaced the result while the deck was loading.
+    const currentResult = translation.result;
+
+    if (!currentResult || currentResult.success === false) {
+      return;
+    }
+
+    translation.result = {
+      success: true,
+      value: {
+        ...currentResult.value,
+        deck: deckResult.value,
+      },
+    };
+  };
+
+  isLoggedIn().then(async (result) => {
+    const loggedIn = result.success && result.value;
+    translation.isLoggedInUser = loggedIn;
+
+    if (loggedIn) {
+      // `loadDeck` gives up quietly on a failed deck request, so the buttons
+      // are revealed either way - the visitor still gets to add a card.
+      await loadDeck();
+      await showActions();
+      return;
+    }
+
+    // A signed out visitor has no deck to wait for. The Learn button offers to
+    // sign in instead of adding.
+    await showActions();
+
+    onSignedIn(() => {
+      translation.isLoggedInUser = true;
+      loadDeck();
+    });
+  });
 };
 
 const existingTranslation = searchContainer.querySelector(
@@ -179,7 +348,7 @@ const existingTranslation = searchContainer.querySelector(
 if (existingTranslation) {
   posthog.capture('search-seo-page-opened');
   existingTranslation.playAudioPronunciation = playAudioPronunciation;
-  existingTranslation.addEventListener('addCard', onLearn);
+  wireTranslation(existingTranslation);
 }
 
 searchForm.addEventListener('valuesChange', (e: CustomEvent<SearchValues>) => {
@@ -246,10 +415,13 @@ const analyze = async (searchValues: SearchValues) => {
   translation.result = createTranslationCards(analyzeResult);
   translation.loading = false;
   translation.playAudioPronunciation = playAudioPronunciation;
-  translation.addEventListener('addCard', onLearn);
 
   resultsContainer.innerHTML = '';
   resultsContainer.appendChild(translation);
+
+  // Must follow the append: `componentOnReady()` only resolves once the
+  // element is in the document.
+  wireTranslation(translation);
 
   translation.addEventListener('retry', () => {
     if (isSearchValues(searchForm.values)) {

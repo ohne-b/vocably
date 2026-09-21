@@ -35,6 +35,9 @@ import { getSelectedTagIds } from '../translation/getSelectedTagIds';
 import { toLocationHash } from '@vocably/sulna';
 import { cardToLocationHash } from '@vocably/model-operations';
 
+// Keep in sync with $sign-in-slide-duration in translation-cards.scss
+const signInSlideDuration = 300;
+
 @Component({
   tag: 'vocably-translation-cards',
   styleUrl: 'translation-cards.scss',
@@ -50,6 +53,11 @@ export class VocablyTranslationCards {
   @Prop() isUpdating: TranslationCard | null = null;
   @Prop({ mutable: true }) disabled = false;
   @Prop() isLightweight = false;
+  @Prop() isLoggedInUser = false;
+  // Hides the add and remove buttons while the deck they depend on is still
+  // unknown. The space they occupy is reserved by `.vocably-safe-action-area`,
+  // so revealing them later doesn't reflow the card.
+  @Prop() hideActions = false;
   @Prop() playAudioPronunciation: (
     payload: AudioPronunciationPayload
   ) => Promise<Result<true>>;
@@ -78,6 +86,8 @@ export class VocablyTranslationCards {
   @State() addedItemIndex = -1;
   @State() congratulateItemIndex = -1;
   @State() addAttemptIndex = -1;
+  @State() signInItemIndex = -1;
+  @State() signInHiding = false;
   @State() removing: {
     card: CardItem;
     tag: TagItem;
@@ -86,6 +96,7 @@ export class VocablyTranslationCards {
   @Element() el: HTMLElement;
 
   private unsubLocale: (() => void) | undefined;
+  private signInHideTimeout: ReturnType<typeof setTimeout> | undefined;
 
   connectedCallback() {
     this.unsubLocale = subscribeToLocale(this.el, () => forceUpdate(this.el));
@@ -93,7 +104,23 @@ export class VocablyTranslationCards {
 
   disconnectedCallback() {
     this.unsubLocale?.();
+    clearTimeout(this.signInHideTimeout);
   }
+
+  private showSignIn = (itemIndex: number) => {
+    clearTimeout(this.signInHideTimeout);
+    this.signInHiding = false;
+    this.signInItemIndex = itemIndex;
+  };
+
+  private hideSignIn = () => {
+    clearTimeout(this.signInHideTimeout);
+    this.signInHiding = true;
+    this.signInHideTimeout = setTimeout(() => {
+      this.signInItemIndex = -1;
+      this.signInHiding = false;
+    }, signInSlideDuration);
+  };
 
   private overlay: HTMLElement | null = null;
   private tagsMenu: HTMLElement | null = null;
@@ -280,9 +307,10 @@ export class VocablyTranslationCards {
     return (
       <Host>
         {this.cards.map((card, itemIndex, cardsArray) => (
-          <div key={itemIndex} id={cardToLocationHash(card.data)}>
+          <div key={`card-${itemIndex}`} id={cardToLocationHash(card.data)}>
             {!this.canAdd && this.cardsLimit !== 'unlimited' && (
               <div
+                key="limit"
                 class={{
                   'max-limit-1': true,
                   'max-limit-visible': this.addAttemptIndex === itemIndex,
@@ -317,6 +345,7 @@ export class VocablyTranslationCards {
             )}
 
             <div
+              key="card"
               data-test="card"
               class={{
                 'vocably-card padding-left-12': true,
@@ -325,6 +354,7 @@ export class VocablyTranslationCards {
             >
               {this.canCongratulate && (
                 <div
+                  key="congratulation"
                   class={
                     'vocably-added-congratulation' +
                     (this.congratulateItemIndex === itemIndex
@@ -339,9 +369,9 @@ export class VocablyTranslationCards {
                   </div>
                 </div>
               )}
-              <div class="vocably-card-container">
+              <div key="container" class="vocably-card-container">
                 <div class="vocably-card-action">
-                  {isCardItem(card) && (
+                  {!this.hideActions && isCardItem(card) && (
                     <div
                       style={{
                         display: 'flex',
@@ -408,7 +438,7 @@ export class VocablyTranslationCards {
                       </button>
                     </div>
                   )}
-                  {isDetachedCardItem(card) && (
+                  {!this.hideActions && isDetachedCardItem(card) && (
                     <button
                       class={{
                         'vocably-card-action-button': true,
@@ -419,6 +449,11 @@ export class VocablyTranslationCards {
                       onClick={() => {
                         if (this.disabled) {
                           return false;
+                        }
+
+                        if (!this.isLoggedInUser) {
+                          this.showSignIn(itemIndex);
+                          return;
                         }
 
                         if (!this.canAdd) {
@@ -441,12 +476,14 @@ export class VocablyTranslationCards {
                         });
                       }}
                     >
-                      {this.isUpdating === card && (
-                        <vocably-icon-spin></vocably-icon-spin>
-                      )}
-                      {this.isUpdating !== card && (
-                        <vocably-icon-plus></vocably-icon-plus>
-                      )}
+                      <span class="vocably-card-action-icon">
+                        {this.isUpdating === card && (
+                          <vocably-icon-spin></vocably-icon-spin>
+                        )}
+                        {this.isUpdating !== card && (
+                          <vocably-icon-plus></vocably-icon-plus>
+                        )}
+                      </span>
                       <span
                         style={{
                           marginLeft: '2px',
@@ -520,6 +557,27 @@ export class VocablyTranslationCards {
                     </div>
                   )}
                 </div>
+                {this.signInItemIndex === itemIndex && !this.isLoggedInUser && (
+                  <div
+                    data-test="sign-in-cover"
+                    class={{
+                      'vocably-sign-in-cover': true,
+                      'vocably-sign-in-cover-hiding': this.signInHiding,
+                    }}
+                  >
+                    <div class="vocably-sign-in-cover-panel">
+                      <vocably-close-button
+                        class="vocably-sign-in-cover-close"
+                        onClose={(event) => {
+                          // Otherwise the whole popup is being closed
+                          event.stopPropagation();
+                          this.hideSignIn();
+                        }}
+                      />
+                      <vocably-sign-in></vocably-sign-in>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
