@@ -1,6 +1,9 @@
 export const uk = {
   // sign-in
   'sign_in.button': 'Увійти або створити акаунт',
+  'sign_in.benefit.sync': 'Синхронізація між пристроями',
+  'sign_in.benefit.study': 'Вчіть картки на телефоні або в браузері',
+  'sign_in.benefit.export': 'Експорт карток у CSV',
   // subscribe
   'subscribe.trial_message':
     'Запитайте 7-денний безкоштовний пробний період, щоб продовжити.',

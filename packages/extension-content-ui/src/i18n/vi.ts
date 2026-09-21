@@ -1,6 +1,9 @@
 export const vi = {
   // sign-in
   'sign_in.button': 'Đăng nhập hoặc tạo tài khoản',
+  'sign_in.benefit.sync': 'Đồng bộ trên mọi thiết bị',
+  'sign_in.benefit.study': 'Học thẻ trên điện thoại hoặc trong trình duyệt',
+  'sign_in.benefit.export': 'Xuất thẻ của bạn dưới dạng CSV',
   // subscribe
   'subscribe.trial_message': 'Yêu cầu dùng thử miễn phí 7 ngày để tiếp tục.',
   'subscribe.message': 'Vui lòng đăng ký để tiếp tục.',

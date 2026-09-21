@@ -1,6 +1,9 @@
 export const es = {
   // sign-in
   'sign_in.button': 'Iniciar sesión o crear una cuenta',
+  'sign_in.benefit.sync': 'Sincroniza entre dispositivos',
+  'sign_in.benefit.study': 'Estudia tus tarjetas en el móvil o en el navegador',
+  'sign_in.benefit.export': 'Exporta tus tarjetas en CSV',
   // subscribe
   'subscribe.trial_message':
     'Solicita una prueba gratuita de 7 días para continuar.',

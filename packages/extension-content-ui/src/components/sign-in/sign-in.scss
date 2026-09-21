@@ -1,3 +1,4 @@
+@use 'sass:math';
 @import '../../styles/component';
 
 :host {
@@ -26,4 +27,34 @@
 
 .link {
   @include link(!important);
+}
+
+.benefits {
+  list-style: none;
+  margin: 0 0 $p-margin;
+  padding: 0;
+  text-align: left;
+}
+
+.benefit {
+  display: flex;
+  align-items: center;
+  gap: math.div($base-font-size, 2);
+  padding: math.div($base-font-size, 2) 0;
+
+  & + & {
+    border-top: $internal-border;
+  }
+}
+
+.benefit-icon {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  fill: $v-light-color-primary;
+}
+
+.benefit-text {
+  font-size: $base-font-size * 0.9;
+  line-height: $base-line-height;
 }

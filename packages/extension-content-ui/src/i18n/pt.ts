@@ -1,6 +1,9 @@
 export const pt = {
   // sign-in
   'sign_in.button': 'Entrar ou criar uma conta',
+  'sign_in.benefit.sync': 'Sincronize entre dispositivos',
+  'sign_in.benefit.study': 'Estude seus cartões no celular ou no navegador',
+  'sign_in.benefit.export': 'Exporte seus cartões em CSV',
   // subscribe
   'subscribe.trial_message':
     'Solicite um período de teste gratuito de 7 dias para continuar.',

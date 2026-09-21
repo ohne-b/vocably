@@ -1,6 +1,9 @@
 export const ru = {
   // sign-in
   'sign_in.button': 'Войти или создать аккаунт',
+  'sign_in.benefit.sync': 'Синхронизация между устройствами',
+  'sign_in.benefit.study': 'Учите карточки на телефоне или в браузере',
+  'sign_in.benefit.export': 'Экспорт карточек в CSV',
   // subscribe
   'subscribe.trial_message':
     'Запросите бесплатный пробный период на 7 дней, чтобы продолжить.',

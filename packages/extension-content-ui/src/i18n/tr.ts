@@ -1,6 +1,9 @@
 export const tr = {
   // sign-in
   'sign_in.button': 'Giriş yap veya hesap oluştur',
+  'sign_in.benefit.sync': 'Cihazlar arasında senkronizasyon',
+  'sign_in.benefit.study': 'Kartlarını telefonda veya tarayıcıda çalış',
+  'sign_in.benefit.export': 'Kartlarını CSV olarak dışa aktar',
   // subscribe
   'subscribe.trial_message':
     'Devam etmek için 7 günlük ücretsiz deneme talep edin.',
