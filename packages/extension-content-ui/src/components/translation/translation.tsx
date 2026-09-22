@@ -466,7 +466,6 @@ export class VocablyTranslation {
                   this.addCard.emit(e.detail);
                 }}
                 onAddCardIntent={(e) => {
-                  e.stopPropagation();
                   this.cardToAdd = e.detail.card.data;
                 }}
                 onWatchMePaying={() => this.watchMePaying.emit()}

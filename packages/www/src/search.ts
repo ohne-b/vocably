@@ -33,7 +33,7 @@ import { configureDeckApi, isLoggedIn, onSignedIn } from './user';
 posthog.init('phc_zSkRhQ7tE4RDFRdxIVXzWwJ66ACL9QAHnyrRpRknyHj', {
   api_host: 'https://api-e.vocably.pro',
   person_profiles: 'identified_only',
-  persistence: 'memory',
+  persistence: 'sessionStorage',
   disable_external_dependency_loading: true,
   capture_pageview: false,
   autocapture: false,
@@ -223,7 +223,7 @@ const wireTranslation = (translation: HTMLVocablyTranslationElement) => {
   translation.addEventListener(
     'addCard',
     async ({ detail: payload }: CustomEvent<AddCardPayload>) => {
-      posthog.capture('search-learn-clicked', {
+      posthog.capture('search-add', {
         ...payload.card.data,
       });
 
@@ -237,6 +237,15 @@ const wireTranslation = (translation: HTMLVocablyTranslationElement) => {
       if (result.success === true) {
         rememberKnowsHowToAdd();
       }
+    }
+  );
+
+  translation.addEventListener(
+    'addCardIntent',
+    ({ detail: payload }: CustomEvent<AddCardPayload>) => {
+      posthog.capture('search-learn-clicked', {
+        ...payload.card.data,
+      });
     }
   );
 
@@ -254,6 +263,7 @@ const wireTranslation = (translation: HTMLVocablyTranslationElement) => {
   // in the app, so this page keeps the looked up word on screen and picks the
   // session up when the visitor returns to the tab.
   translation.addEventListener('confirm', () => {
+    posthog.capture('search-sign-in-clicked');
     window.open(signInUrl, '_blank')?.focus();
   });
 
@@ -336,6 +346,8 @@ const wireTranslation = (translation: HTMLVocablyTranslationElement) => {
 
     // The session is picked up when the visitor comes back to this tab.
     onSignedIn(async () => {
+      posthog.capture('search-user-signed-in');
+
       translation.isLoggedInUser = true;
 
       try {

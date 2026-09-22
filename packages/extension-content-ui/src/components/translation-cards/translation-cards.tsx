@@ -83,7 +83,7 @@ export class VocablyTranslationCards {
   // A signed out visitor gets the sign in cover instead of the add, so the card
   // they picked is announced separately. `vocably-translation` remembers it and
   // adds it once they are signed in.
-  @Event() addCardIntent: EventEmitter<AddCardPayload>;
+  @Event({ bubbles: true }) addCardIntent: EventEmitter<AddCardPayload>;
   @Event() watchMePaying: EventEmitter<void>;
   @Event() resultUpdated: EventEmitter<Result<TranslationCards>>;
 
