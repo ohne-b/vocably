@@ -12,6 +12,7 @@ import {
   getUserStaticMetadata,
 } from '@vocably/api';
 import { AuthService } from '../../../auth/auth.service';
+import { detectTargetLanguage } from '../../../welcome/pages/index-page/detectTargetLanguage';
 
 const stepLabelKeys: Record<string, string> = {
   mf: 'settings.study_steps.mf',
@@ -50,7 +51,7 @@ export class StudyStepsComponent implements OnInit {
     if (!languagesResult.success) return;
 
     this.translationLanguage =
-      metadataResult.value.defaultTranslationLanguage ?? null;
+      metadataResult.value.defaultTranslationLanguage ?? detectTargetLanguage();
 
     if (languagesResult.value.length > 0) {
       this.sourceLanguage = languagesResult.value[0];
