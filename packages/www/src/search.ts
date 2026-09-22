@@ -334,9 +334,21 @@ const wireTranslation = (translation: HTMLVocablyTranslationElement) => {
     // sign in instead of adding.
     await showActions();
 
-    onSignedIn(() => {
+    // The session is picked up when the visitor comes back to this tab.
+    onSignedIn(async () => {
       translation.isLoggedInUser = true;
-      loadDeck();
+
+      try {
+        await loadDeck();
+      } finally {
+        // If they hit Learn before signing in, the component has kept that card
+        // and has been waiting for their collection to tell whether it still
+        // needs adding. It is asked on every way out of the load: a deck that
+        // failed to arrive is not going to arrive later, and leaving the card
+        // waiting forever would be worse than adding it against an empty
+        // collection - `addCard` reloads the deck on the server side anyway.
+        await translation.addRememberedCard();
+      }
     });
   });
 };

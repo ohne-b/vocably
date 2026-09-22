@@ -18,8 +18,10 @@ import {
   AudioPronunciationPayload,
   CardsLimit,
   DeleteTagPayload,
+  DetachedCard,
   DetachTagPayload,
   GoogleLanguage,
+  isDetachedCardItem,
   isGoogleTTSLanguage,
   languageList,
   RateInteractionPayload,
@@ -35,6 +37,7 @@ import { subscribeToLocale, t } from '../../i18n';
 import { sortLanguages } from './sortLanguages';
 import {
   createTranslationCards,
+  equalCards,
   getAddedToday,
 } from '@vocably/model-operations';
 import { isString } from 'lodash-es';
@@ -127,6 +130,14 @@ export class VocablyTranslation {
   @State() addedToday = 0;
   @State() translationCards: TranslationCard[] = [];
   @State() extraCards: TranslationCard[] = [];
+  /**
+   * The card a signed out visitor asked to add, kept until it can actually be
+   * added: signing in happens elsewhere, and the collection it has to be
+   * checked against is only downloaded afterwards.
+   *
+   * Only the last one asked for - picking another card replaces it.
+   */
+  @State() cardToAdd: DetachedCard | null = null;
 
   @Watch('result')
   resultChanged(result: Result<TranslationCards> | null) {
@@ -153,6 +164,96 @@ export class VocablyTranslation {
     } else {
       this.extraCards = [];
     }
+  }
+
+  /**
+   * The remembered card as it stands in one of the rendered lists, but only
+   * once the visitor has signed in and the add is merely waiting for their
+   * collection.
+   *
+   * While they are still signed out it is `null`: the card is remembered, yet
+   * nothing about the buttons may change, as they are free to close the sign in
+   * cover and pick another card instead.
+   */
+  private findPendingCard = (
+    cards: TranslationCard[]
+  ): TranslationCard | null => {
+    const cardToAdd = this.cardToAdd;
+
+    if (cardToAdd === null || !this.isLoggedInUser) {
+      return null;
+    }
+
+    return cards.find((card) => equalCards(cardToAdd)(card.data)) ?? null;
+  };
+
+  /**
+   * Adds the card the visitor picked before signing in, if there is one.
+   *
+   * To be called once they are signed in and their own collection has been
+   * downloaded and handed over through `result`: only then can it be told
+   * whether the card has to be added at all. The host is the one that knows
+   * when that has happened, which is why this is asked for rather than guessed
+   * at from the props.
+   *
+   * The add is emitted from here rather than from `vocably-translation-cards`
+   * so that it travels the very same path a click does: the host puts the card
+   * into `isUpdating`, hands the new deck back through `result`, and every
+   * loader and interface change that follows an add happens on its own.
+   */
+  @Method()
+  async addRememberedCard(): Promise<void> {
+    if (this.cardToAdd === null || !this.isLoggedInUser) {
+      return;
+    }
+
+    const result = this.result;
+
+    if (!result || result.success === false) {
+      return;
+    }
+
+    const card = this.findPendingCard([
+      ...this.translationCards,
+      ...this.extraCards,
+    ]);
+
+    // One attempt only, so a second call has nothing left to do: a failed add
+    // comes back as an error `result`, and retrying it behind the visitor's
+    // back would take the page away from them over and over.
+    this.cardToAdd = null;
+
+    // The collection may well contain the card already - added on another
+    // device, or in the very tab the visitor has just signed in from. A card
+    // that is no longer detached is a card there is nothing left to do about.
+    if (card === null || !isDetachedCardItem(card)) {
+      return;
+    }
+
+    // Over the free plan limit the add button opens the upgrade panel instead
+    // of adding, and that panel belongs to a click on a card. The remembered
+    // add is dropped, leaving the visitor with the button they came for.
+    if (!this.canAdd) {
+      return;
+    }
+
+    this.addCard.emit({
+      translationCards: result.value,
+      card,
+    });
+  }
+
+  private get canAdd(): boolean {
+    return !!(
+      this.cardsLimit === 'unlimited' ||
+      !this.paymentLink ||
+      (this.result &&
+        this.result.success &&
+        this.result.value.deck.cards.length < this.cardsLimit.maxCards) ||
+      (this.result &&
+        this.result.success &&
+        this.cardsLimit.cardsPerDay > this.addedToday)
+    );
   }
 
   private unsubLocale: (() => void) | undefined;
@@ -244,17 +345,17 @@ export class VocablyTranslation {
       this.result.success &&
       this.result.value.aiThinksItIs;
 
-    const canAdd =
-      this.cardsLimit === 'unlimited' ||
-      !this.paymentLink ||
-      (this.result &&
-        this.result.success &&
-        this.result.value.deck.cards.length < this.cardsLimit.maxCards) ||
-      (this.result &&
-        this.result.success &&
-        this.cardsLimit.cardsPerDay > this.addedToday);
+    const canAdd = this.canAdd;
 
     const isOkayToAskForRating = this.askForRating && canAdd;
+
+    // A card that is only waiting for the collection to arrive is already being
+    // added as far as the visitor is concerned, so it shows the spinner the
+    // click would have given it - and, just as during an add, no other card can
+    // be clicked in the meantime.
+    const isUpdating =
+      this.isUpdating ??
+      this.findPendingCard([...this.translationCards, ...this.extraCards]);
 
     return (
       <Host data-test="translation-container">
@@ -344,11 +445,11 @@ export class VocablyTranslation {
               <vocably-translation-cards
                 cards={this.translationCards}
                 translationCards={this.result.value}
-                canAdd={!!canAdd}
+                canAdd={canAdd}
                 cardsLimit={this.cardsLimit}
                 paymentLink={this.paymentLink}
                 canCongratulate={this.canCongratulate}
-                isUpdating={this.isUpdating}
+                isUpdating={isUpdating}
                 disabled={this.disabled}
                 isLightweight={this.isLightweight}
                 isLoggedInUser={this.isLoggedInUser}
@@ -363,6 +464,10 @@ export class VocablyTranslation {
                 onAddCard={(e) => {
                   e.stopPropagation();
                   this.addCard.emit(e.detail);
+                }}
+                onAddCardIntent={(e) => {
+                  e.stopPropagation();
+                  this.cardToAdd = e.detail.card.data;
                 }}
                 onWatchMePaying={() => this.watchMePaying.emit()}
                 onResultUpdated={(e) => {
@@ -410,13 +515,14 @@ export class VocablyTranslation {
                     <vocably-translation-cards
                       cards={this.extraCards}
                       translationCards={this.result.value}
-                      canAdd={!!canAdd}
+                      canAdd={canAdd}
                       cardsLimit={this.cardsLimit}
                       paymentLink={this.paymentLink}
                       canCongratulate={this.canCongratulate}
-                      isUpdating={this.isUpdating}
+                      isUpdating={isUpdating}
                       disabled={this.disabled}
                       isLightweight={this.isLightweight}
+                      isLoggedInUser={this.isLoggedInUser}
                       hideActions={this.hideActions}
                       playAudioPronunciation={this.playAudioPronunciation}
                       updateCard={this.updateCard}
@@ -426,6 +532,9 @@ export class VocablyTranslation {
                       deleteTag={this.deleteTag}
                       onRemoveCard={(e) => this.removeCard.emit(e.detail)}
                       onAddCard={(e) => this.addCard.emit(e.detail)}
+                      onAddCardIntent={(e) => {
+                        this.cardToAdd = e.detail.card.data;
+                      }}
                       onWatchMePaying={() => this.watchMePaying.emit()}
                       onResultUpdated={(e) => {
                         this.result = e.detail;

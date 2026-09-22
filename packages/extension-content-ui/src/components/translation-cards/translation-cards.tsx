@@ -8,6 +8,7 @@ import {
   Host,
   Prop,
   State,
+  Watch,
 } from '@stencil/core';
 import { isItem } from '@vocably/crud';
 import {
@@ -79,6 +80,10 @@ export class VocablyTranslationCards {
 
   @Event() removeCard: EventEmitter<RemoveCardPayload>;
   @Event() addCard: EventEmitter<AddCardPayload>;
+  // A signed out visitor gets the sign in cover instead of the add, so the card
+  // they picked is announced separately. `vocably-translation` remembers it and
+  // adds it once they are signed in.
+  @Event() addCardIntent: EventEmitter<AddCardPayload>;
   @Event() watchMePaying: EventEmitter<void>;
   @Event() resultUpdated: EventEmitter<Result<TranslationCards>>;
 
@@ -105,6 +110,28 @@ export class VocablyTranslationCards {
   disconnectedCallback() {
     this.unsubLocale?.();
     clearTimeout(this.signInHideTimeout);
+  }
+
+  /**
+   * An add does not always start with a click in here: a card picked while
+   * signed out is added by `vocably-translation` once the visitor has signed in
+   * and their collection has arrived. The card being added shows up as
+   * `isUpdating` either way, so the congratulation follows that rather than the
+   * click.
+   */
+  @Watch('isUpdating')
+  isUpdatingChanged(card: TranslationCard | null) {
+    if (
+      card === null ||
+      !isDetachedCardItem(card) ||
+      this.congratulateItemIndex !== -1
+    ) {
+      return;
+    }
+
+    // -1 for a card of the other list, which is exactly the "nothing to
+    // congratulate" value.
+    this.congratulateItemIndex = this.cards.indexOf(card);
   }
 
   private showSignIn = (itemIndex: number) => {
@@ -452,6 +479,15 @@ export class VocablyTranslationCards {
                         }
 
                         if (!this.isLoggedInUser) {
+                          // Adding is impossible until the visitor signs in,
+                          // which happens elsewhere. Their choice is handed
+                          // over to `vocably-translation`, the only part of
+                          // this that survives long enough to add the card once
+                          // the session and the collection are there.
+                          this.addCardIntent.emit({
+                            translationCards: this.translationCards,
+                            card,
+                          });
                           this.showSignIn(itemIndex);
                           return;
                         }
