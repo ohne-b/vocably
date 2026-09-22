@@ -1,4 +1,38 @@
 {
+  "apple": {
+    "source": "apple",
+    "sourceLanguage": "de",
+    "targetLanguage": "en",
+    "isDirect": false,
+    "deck": {
+      "cards": [],
+      "tags": [],
+      "language": "de"
+    },
+    "items": [
+      {
+        "source": "der Apfel",
+        "translation": "apple, pome",
+        "definitions": [
+          "Rundliche, essbare Frucht des Apfelbaums",
+          "Scheinfrucht der Gattung Malus"
+        ],
+        "examples": [
+          "Ein roter Apfel.",
+          "Sie isst einen Apfel.",
+          "Der Apfel fällt nicht weit vom Stamm."
+        ],
+        "partOfSpeech": "noun",
+        "ipa": "ˈapfəl",
+        "g": "masculine",
+        "number": "singular",
+        "pluralForm": "die Äpfel"
+      }
+    ],
+    "detectedInputType": "word",
+    "extraItems": [],
+    "explanation": ""
+  },
   "exercise": {
     "source": "exercise",
     "sourceLanguage": "de",
