@@ -1,5 +1,8 @@
 <div class="container-xl top"><app-header></app-header></div>
 <div class="container-l bottom">
-  <app-carousel></app-carousel>
-  <app-sign-in></app-sign-in>
+  <app-carousel class="mb-2 block"></app-carousel>
+  <h1 class="text-center mb-2">
+    {{ 'auth.carousel.need_account' | transloco }}
+  </h1>
+  <app-sign-up></app-sign-up>
 </div>

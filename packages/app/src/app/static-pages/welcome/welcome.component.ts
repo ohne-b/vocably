@@ -3,15 +3,16 @@ import { Router } from '@angular/router';
 import { Subject, take, takeUntil } from 'rxjs';
 import { AuthService } from '../../auth/auth.service';
 import { CarouselComponent } from '../../auth/carousel/carousel.component';
-import { SignInComponent } from '../../auth/sign-in/sign-in.component';
+import { SignUpComponent } from '../../auth/sign-up/sign-up.component';
 import { HeaderComponent } from '../../header/header.component';
 import { setStats } from '../../stats';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-welcome',
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.scss'],
-  imports: [HeaderComponent, CarouselComponent, SignInComponent],
+  imports: [HeaderComponent, CarouselComponent, SignUpComponent, TranslocoPipe],
 })
 export class WelcomeComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject();
