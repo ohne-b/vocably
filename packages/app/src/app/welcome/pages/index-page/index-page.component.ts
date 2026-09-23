@@ -8,7 +8,7 @@ import {
   setProxyLanguage,
 } from '@vocably/extension-messages';
 import { GoogleLanguage, sortedTargetLanguages } from '@vocably/model';
-import { extensionId } from '../../../../extension';
+import { getExtensionId } from '../../../../extension';
 import { isFirefox } from '../../../../firefox';
 import { LanguageIconComponent } from '../../../components/language-icon/language-icon.component';
 import { LanguageInputComponent } from '../../../components/language-input/language-input.component';
@@ -57,7 +57,7 @@ export class IndexPageComponent implements OnInit {
   private async getInitialLanguageInputValue(): Promise<GoogleLanguage> {
     const proxyLanguage = isFirefox
       ? null
-      : await getProxyLanguage(extensionId);
+      : await getProxyLanguage(await getExtensionId());
 
     if (proxyLanguage) {
       return proxyLanguage;
@@ -90,6 +90,6 @@ export class IndexPageComponent implements OnInit {
   }
 
   async saveProxyLanguage(language: GoogleLanguage) {
-    await setProxyLanguage(extensionId, language);
+    await setProxyLanguage(await getExtensionId(), language);
   }
 }

@@ -8,7 +8,8 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { TranslocoModule } from '@jsverse/transloco';
-import { isChrome, isMacSafari } from '../../../../../browser';
+import { isChrome, isEdge, isMacSafari } from '../../../../../browser';
+import { edgeExtensionInstallationUrl } from '../../../../../extension';
 
 type Platform = {
   name: string;
@@ -16,6 +17,13 @@ type Platform = {
 };
 
 const getPlatform = (): Platform | null => {
+  if (isEdge) {
+    return {
+      name: 'Edge Add-ons',
+      url: edgeExtensionInstallationUrl,
+    };
+  }
+
   if (isChrome) {
     return {
       name: 'Chrome Web Store',

@@ -36,6 +36,24 @@ export const detectExtensionPlatform = (): ExtensionPlatform => {
     };
   }
 
+  // Chromium-based Edge runs the very same build, published under a separate
+  // listing, so only the store differs. `platform` stays `chromeExtension`:
+  // it is reported to the backend and shared with `@vocably/model`.
+  if (
+    browser.satisfies({
+      desktop: {
+        edge: '>=79',
+      },
+    })
+  ) {
+    return {
+      url: 'https://microsoftedge.microsoft.com/addons/detail/dahphaiflimmafjchchidjmgidlkajho',
+      name: 'Edge Add-ons',
+      platform: 'chromeExtension',
+      paymentLink: 'web',
+    };
+  }
+
   return {
     url: 'https://chrome.google.com/webstore/detail/vocably/baocigmmhhdemijfjnjdidbkfgpgogmb',
     name: 'Chrome Web Store',

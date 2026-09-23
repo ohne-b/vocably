@@ -35,11 +35,22 @@ export const isChrome = !!browser.satisfies({
   },
 });
 
+/**
+ * Chromium-based Edge (79+). Bowser gives Edge a name of its own, so `isChrome`
+ * is false here even though Edge runs the very same extension build. Legacy
+ * EdgeHTML is excluded: it cannot run Chromium extensions.
+ */
+export const isEdge = !!browser.satisfies({
+  desktop: {
+    edge: '>=79',
+  },
+});
+
 export const isDesktop = browser.getPlatformType() === 'desktop';
 
 export const browserType: 'desktop-safari' | 'ios-safari' | 'normal' =
   isIOS() && browser.satisfies({ safari: '>0' })
     ? 'ios-safari'
     : browser.satisfies({ macos: { safari: '>0' } })
-    ? 'desktop-safari'
-    : 'normal';
+      ? 'desktop-safari'
+      : 'normal';

@@ -1,8 +1,8 @@
 import { ResourcesConfig } from '@aws-amplify/core';
-import { AppAuthStorage } from '@vocably/pontis';
 import { appBaseUrl } from './app-base-url';
+import { DeferredAppAuthStorage } from './deferred-auth-storage';
 import { environment } from './environments/environment';
-import { extensionId } from './extension';
+import { getExtensionId } from './extension';
 import { isFirefox } from './firefox';
 import { FirefoxAppAuthStorage } from './firefox-auth-storage';
 
@@ -50,7 +50,7 @@ export const signInConfirmationPath = redirectSignInUrl.substring(
  */
 export const authStorage = isFirefox
   ? new FirefoxAppAuthStorage()
-  : new AppAuthStorage(extensionId);
+  : new DeferredAppAuthStorage(getExtensionId());
 
 /**
  * `environment.auth` keeps the shape Terraform generates (see

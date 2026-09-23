@@ -37,7 +37,7 @@ import {
   withLatestFrom,
 } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { extensionId } from '../../../extension';
+import { getExtensionId } from '../../../extension';
 import { DeckSelectorComponent } from '../../components/deck-selector/deck-selector.component';
 import { LanguageInputComponent } from '../../components/language-input/language-input.component';
 import { HeaderComponent } from '../../header/header.component';
@@ -61,7 +61,9 @@ const detectImportDeck = async (): Promise<GoogleLanguage | ''> => {
   );
 
   if (isExtensionInstalled) {
-    const extensionSourceLanguage = await getSourceLanguage(extensionId);
+    const extensionSourceLanguage = await getSourceLanguage(
+      await getExtensionId()
+    );
     if (extensionSourceLanguage) {
       return extensionSourceLanguage;
     }

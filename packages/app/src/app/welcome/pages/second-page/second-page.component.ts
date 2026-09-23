@@ -23,7 +23,7 @@ import {
   tap,
   throwError,
 } from 'rxjs';
-import { extensionId } from '../../../../extension';
+import { getExtensionId } from '../../../../extension';
 import { getFacility } from '../../../getFacility';
 import { GenericInstructionComponent } from '../../generic-instruction/generic-instruction.component';
 import { HowToVideoComponent } from '../../how-to-video/how-to-video.component';
@@ -122,6 +122,7 @@ export class SecondPageComponent implements OnInit, OnDestroy {
         }),
         tap(() => (this.isLoading = true)),
         tap(async (params) => {
+          const extensionId = await getExtensionId();
           await setSourceLanguage(extensionId, params['sourceLanguage']);
           await setProxyLanguage(extensionId, params['targetLanguage']);
           this.sourceLanguage = params['sourceLanguage'];
