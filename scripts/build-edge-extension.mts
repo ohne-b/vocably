@@ -15,6 +15,15 @@ import { fileURLToPath } from 'node:url';
 
 const rootDir = dirname(dirname(fileURLToPath(import.meta.url)));
 
+const edgeKey =
+  'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAit47weXUG/mSAlRVA0tZ' +
+  'zCiXUH0ZuYpurQbHMxNzBoCeFfFq45XRuDCusozQ412Pi6mqrO56uyu2GAQrgZJQ' +
+  'a31kUjYDu73VnfVU85gI7WtU+klkWNz8GPK4DzNOOEE4tdi5IG5NcgVFtG+7lfPk' +
+  'sDCZkkQ3YhIi081fB5Q3TodNnH+cvhEbKK/tXDLwGo/B3nTEbc/4+/ALZ6KlV8/2' +
+  '1ZVe1dDWWVJQVOtQMFCJgz9gOGsqnu+2GbF+9zQfIo1GQ2B4pRi4ta6UMs6E/Fqe' +
+  'SDcmOAHUds8tnqldVJ14dgo9z6XKKxnsjCd3sZKFw8+z1Ds9hJmLHuUQata6yt8l' +
+  'SwIDAQAB';
+
 const environments = ['dev', 'prod'] as const;
 
 type Environment = (typeof environments)[number];
@@ -76,13 +85,9 @@ try {
 
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
 
-  if ('key' in manifest) {
-    console.log('Removing the "key" param from manifest.json...');
-    delete manifest.key;
-    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
-  } else {
-    console.log('The manifest.json doesn\'t contain the "key" param.');
-  }
+  console.log('Setting the "key" param in manifest.json...');
+  manifest.key = edgeKey;
+  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 
   mkdirSync(outputDir, { recursive: true });
   rmSync(outputPath, { force: true });
