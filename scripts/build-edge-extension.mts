@@ -15,19 +15,37 @@ import { fileURLToPath } from 'node:url';
 
 const rootDir = dirname(dirname(fileURLToPath(import.meta.url)));
 
-const artifactsUrl =
-  'http://vocably-prod-artifacts.s3-website.eu-central-1.amazonaws.com';
+const environments = ['dev', 'prod'] as const;
 
-let version = (process.argv[2] ?? 'latest').trim().replace(/\./g, '_');
+type Environment = (typeof environments)[number];
 
-if (version !== 'latest' && !version.startsWith('prod_')) {
-  version = `prod_${version}`;
+const isEnvironment = (value: string): value is Environment =>
+  environments.includes(value as Environment);
+
+const env = (process.argv[2] ?? '').trim();
+
+if (!isEnvironment(env)) {
+  console.error(
+    `Usage: ./scripts/build-edge-extension.mts <${environments.join(
+      '|'
+    )}> [version]`
+  );
+  process.exit(1);
+}
+
+const artifactsUrl = `http://vocably-${env}-artifacts.s3-website.eu-central-1.amazonaws.com`;
+
+let version = (process.argv[3] ?? 'latest').trim().replace(/\./g, '_');
+
+if (version !== 'latest' && !version.startsWith(`${env}_`)) {
+  version = `${env}_${version}`;
 }
 
 const sourceUrl = `${artifactsUrl}/${version}.zip`;
 
+const outputName = version === 'latest' ? `${env}_latest` : version;
 const outputDir = `${rootDir}/tmp/edge`;
-const outputPath = `${outputDir}/${version}.zip`;
+const outputPath = `${outputDir}/${outputName}.zip`;
 
 const workingDir = mkdtempSync(`${tmpdir()}/vocably-edge-`);
 const downloadPath = `${workingDir}/${version}.zip`;
