@@ -70,15 +70,19 @@ export class StudyPageComponent implements OnInit, OnDestroy {
 
       let predefinedCards: CardItem[] = [];
 
+      const translationLanguage =
+        userMetadataResult.value.defaultTranslationLanguage ??
+        localStorage.getItem('searchTargetLanguage');
+
       if (
-        isGoogleLanguage(userMetadataResult.value.defaultTranslationLanguage) &&
+        isGoogleLanguage(translationLanguage) &&
         isGoogleLanguage(this.deckStore.deck$.value.language)
       ) {
         const abortController = new AbortController();
         const predefinedCardsResult = await timeout(
           publicPredefinedOptions(
             this.deckStore.deck$.value.language,
-            userMetadataResult.value.defaultTranslationLanguage,
+            translationLanguage,
             abortController
           ),
           abortController,
