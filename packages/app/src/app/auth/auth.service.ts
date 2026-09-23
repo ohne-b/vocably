@@ -19,6 +19,7 @@ import {
   signOut,
   signUp,
 } from 'aws-amplify/auth';
+import { Hub } from 'aws-amplify/utils';
 import { map, ReplaySubject, retry, Subject, switchMap, take, tap } from 'rxjs';
 import { signInConfirmationPath } from '../../auth-config';
 
@@ -86,6 +87,7 @@ export class AuthService {
     private transloco: TranslocoService
   ) {
     this.refreshUser();
+    this.listenForSignOut();
 
     const refreshUserData$ = this.fetchUserData$.pipe(
       tap((userData) => {
@@ -100,6 +102,30 @@ export class AuthService {
   private get clientMetadata() {
     // Picked up by the custom message trigger to localize the email.
     return { locale: this.transloco.getActiveLang() };
+  }
+
+  /**
+   * Amplify only leaves the app on sign-out (through the Cognito logout
+   * endpoint) when the session came from Google/Apple. An email + password
+   * session, and deleting the account, which signs out too, stay on the
+   * current page, so the app has to move on by itself.
+   */
+  private listenForSignOut() {
+    Hub.listen('auth', ({ payload }) => {
+      if (payload.event !== 'signedOut') {
+        return;
+      }
+
+      // Otherwise the guest guard would still see a signed-in user and bounce
+      // the navigation below back to the decks.
+      this.isLoggedIn$.next(false);
+
+      if (this.router.url.startsWith('/sign-out')) {
+        return;
+      }
+
+      this.router.navigate(['/sign-up'], { replaceUrl: true });
+    });
   }
 
   private async refreshUser(): Promise<void> {
