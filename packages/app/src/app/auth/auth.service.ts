@@ -15,6 +15,7 @@ import {
   resetPassword,
   signIn,
   signInWithRedirect,
+  SignInWithRedirectInput,
   signOut,
   signUp,
 } from 'aws-amplify/auth';
@@ -22,6 +23,15 @@ import { map, ReplaySubject, retry, Subject, switchMap, take, tap } from 'rxjs';
 import { signInConfirmationPath } from '../../auth-config';
 
 export type SocialProvider = 'Google' | 'Apple';
+
+type AuthPrompt = NonNullable<
+  NonNullable<SignInWithRedirectInput['options']>['prompt']
+>;
+
+const providerPrompt: Record<SocialProvider, AuthPrompt> = {
+  Google: 'SELECT_ACCOUNT',
+  Apple: 'LOGIN',
+};
 
 /**
  * What the screen has to do after an email + password call that did not throw.
@@ -112,7 +122,10 @@ export class AuthService {
   }
 
   async signInWithProvider(provider: SocialProvider) {
-    return signInWithRedirect({ provider });
+    return signInWithRedirect({
+      provider,
+      options: { prompt: providerPrompt[provider] },
+    });
   }
 
   async signInWithEmail(
