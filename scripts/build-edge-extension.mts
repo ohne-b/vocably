@@ -2,6 +2,7 @@
 
 import { execFileSync } from 'node:child_process';
 import {
+  cpSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
@@ -55,6 +56,7 @@ const sourceUrl = `${artifactsUrl}/${version}.zip`;
 const outputName = version === 'latest' ? `${env}_latest` : version;
 const outputDir = `${rootDir}/tmp/edge`;
 const outputPath = `${outputDir}/${outputName}.zip`;
+const outputUnpackedPath = `${outputDir}/${outputName}`;
 
 const workingDir = mkdtempSync(`${tmpdir()}/vocably-edge-`);
 const downloadPath = `${workingDir}/${version}.zip`;
@@ -91,6 +93,10 @@ try {
 
   mkdirSync(outputDir, { recursive: true });
   rmSync(outputPath, { force: true });
+  rmSync(outputUnpackedPath, { recursive: true, force: true });
+
+  console.log('Saving the unpacked version...');
+  cpSync(unpackedDir, outputUnpackedPath, { recursive: true });
 
   console.log('Packing...');
   execFileSync('zip', ['-9', '-y', '-r', '-q', outputPath, '.'], {
@@ -98,6 +104,7 @@ try {
     stdio: 'inherit',
   });
 
+  console.log(outputUnpackedPath);
   console.log(outputPath);
 } catch (e) {
   console.error(e instanceof Error ? e.message : e);
