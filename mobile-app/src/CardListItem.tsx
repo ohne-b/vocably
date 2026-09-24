@@ -6,7 +6,6 @@ import React, { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   PixelRatio,
-  Platform,
   Pressable,
   StyleProp,
   View,
@@ -24,6 +23,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { CardDefinition } from './CardDefinition';
 import { CardExample } from './CardExample';
+import { isolate } from './isolate';
 import { PlaySound } from './PlaySound';
 
 type Props = {
@@ -38,9 +38,6 @@ type Props = {
   disabledModalLookup?: boolean;
   hideDefinitions?: boolean;
 };
-
-const textTransform = [{ translateY: 6 }];
-const lineHeight = Platform.OS === 'ios' ? 26 : 20;
 
 export const CardListItem: FC<Props> = ({
   card,
@@ -67,11 +64,11 @@ export const CardListItem: FC<Props> = ({
   const fontScale = PixelRatio.getFontScale();
 
   const present = card.presentTenses
-    ? t('common.presentTenses', { value: card.presentTenses })
+    ? t('common.presentTenses', { value: isolate(card.presentTenses) })
     : false;
   const past =
     card.tense === 'present' && card.pastTenses
-      ? t('common.pastTenses', { value: card.pastTenses })
+      ? t('common.pastTenses', { value: isolate(card.pastTenses) })
       : false;
 
   const presentAndPast = [present, past].filter(Boolean).join(`\n`);
@@ -80,154 +77,86 @@ export const CardListItem: FC<Props> = ({
     <View style={style}>
       <View
         style={{
-          display: 'flex',
           flexDirection: 'row',
-          alignItems: 'baseline',
           flexWrap: 'wrap',
+          alignItems: 'center',
+          columnGap: 8,
+          rowGap: 2,
           width: '100%',
+          // Keep LTR order even when the card is in an RTL language.
+          direction: 'ltr',
         }}
       >
-        <View style={{ width: '100%' }}>
-          <Text
-            style={{
-              fontSize: 16,
-              textAlignVertical: 'top',
+        {isGoogleTTSLanguage(card.language) && (
+          <PlaySound text={card.source} language={card.language} size={22} />
+        )}
+        <Text
+          style={{
+            fontSize: 24,
+            color: theme.colors.secondary,
+            flexShrink: 1,
+          }}
+        >
+          {card.source}
+        </Text>
+        {allowCopy && (
+          <Pressable
+            hitSlop={10}
+            onPress={() => {
+              Clipboard.setString(card.source);
+              !copied && setCopied(true);
             }}
+            style={({ pressed }) => ({
+              opacity: pressed ? 0.4 : 1,
+            })}
           >
-            {isGoogleTTSLanguage(card.language) && (
-              <>
-                <PlaySound
-                  text={card.source}
-                  language={card.language}
-                  size={22}
-                  style={{
-                    transform: [
-                      { translateY: Platform.OS === 'android' ? 6 : 2 },
-                    ],
-                    justifyContent: 'center',
-                  }}
-                />{' '}
-              </>
-            )}
-            <Text
-              style={{
-                fontSize: 24,
-                color: theme.colors.secondary,
-              }}
-            >
-              {card.source}
-            </Text>
-            {allowCopy && (
-              <>
-                {'\u00A0'}
-                <Pressable
-                  hitSlop={10}
-                  onPress={() => {
-                    Clipboard.setString(card.source);
-                    !copied && setCopied(true);
-                  }}
-                  style={({ pressed }) => ({
-                    opacity: pressed ? 0.4 : 1,
-                    transform: [
-                      { translateY: Platform.OS === 'android' ? 6 : 0 },
-                    ],
-                  })}
-                >
-                  <Icon
-                    name="content-copy"
-                    size={17 * fontScale}
-                    color={theme.colors.onSurface}
-                  />
-                </Pressable>
-              </>
-            )}
-            {aiButton !== 'none' && (
-              <>
-                {'\u00A0'}
-                {'\u00A0'}
-                {'\u00A0'}
-                <Pressable
-                  hitSlop={10}
-                  onPress={() => {
-                    // @ts-ignore
-                    navigation.navigate('ChatWithCardModal', {
-                      card,
-                    });
-                  }}
-                  style={({ pressed }) => ({
-                    opacity: pressed ? 0.4 : 1,
-                    transform: [
-                      { translateY: Platform.OS === 'android' ? 6 : 0 },
-                    ],
-                  })}
-                >
-                  <Icon
-                    name="creation"
-                    size={17 * fontScale}
-                    color={
-                      aiButton === 'bright'
-                        ? theme.colors.primary
-                        : theme.colors.onSurface
-                    }
-                  />
-                </Pressable>
-                {'\u00A0'}
-                {'\u00A0'}
-                {'\u00A0'}
-              </>
-            )}
-            {card.ipa && (
-              <>
-                {' '}
-                <View style={{ transform: textTransform }}>
-                  <Text style={{ lineHeight }}>
-                    /{sanitizeTranscript(card.ipa)}/
-                  </Text>
-                </View>
-              </>
-            )}
-
-            {card.g && (
-              <>
-                {' '}
-                <View style={{ transform: textTransform }}>
-                  <Text style={{ lineHeight }}>({card.g})</Text>
-                </View>
-              </>
-            )}
-
-            {card.partOfSpeech && (
-              <>
-                {' '}
-                <View style={{ transform: textTransform }}>
-                  <Text style={{ lineHeight }}>
-                    {t(`language.${card.partOfSpeech}`, card.partOfSpeech)}
-                  </Text>
-                </View>
-              </>
-            )}
-
-            {presentAndPast && (
-              <>
-                {'\n'}
-                <View style={{ transform: textTransform }}>
-                  <Text style={{ lineHeight }}>{presentAndPast}</Text>
-                </View>
-              </>
-            )}
-
-            {card.number === 'singular' && isGoodPlural(card.pluralForm) && (
-              <>
-                {' '}
-                <View style={{ transform: textTransform }}>
-                  <Text style={{ lineHeight }}>
-                    {t('common.plural', { value: card.pluralForm })}
-                  </Text>
-                </View>
-              </>
-            )}
+            <Icon
+              name="content-copy"
+              size={17 * fontScale}
+              color={theme.colors.onSurface}
+            />
+          </Pressable>
+        )}
+        {aiButton !== 'none' && (
+          <Pressable
+            hitSlop={10}
+            onPress={() => {
+              // @ts-ignore
+              navigation.navigate('ChatWithCardModal', {
+                card,
+              });
+            }}
+            style={({ pressed }) => ({
+              opacity: pressed ? 0.4 : 1,
+              marginHorizontal: 8,
+            })}
+          >
+            <Icon
+              name="creation"
+              size={17 * fontScale}
+              color={
+                aiButton === 'bright'
+                  ? theme.colors.primary
+                  : theme.colors.onSurface
+              }
+            />
+          </Pressable>
+        )}
+        {card.ipa && <Text>/{sanitizeTranscript(card.ipa)}/</Text>}
+        {card.g && <Text>({isolate(card.g)})</Text>}
+        {card.partOfSpeech && (
+          <Text>{t(`language.${card.partOfSpeech}`, card.partOfSpeech)}</Text>
+        )}
+        {presentAndPast && (
+          <Text style={{ width: '100%' }}>{presentAndPast}</Text>
+        )}
+        {card.number === 'singular' && isGoodPlural(card.pluralForm) && (
+          <Text>
+            {t('common.plural', {
+              value: isolate(card.pluralForm),
+            })}
           </Text>
-        </View>
+        )}
       </View>
       {allowCopy && (
         <Portal>

@@ -1,10 +1,11 @@
 import { CardItem, DeckSettings, isGoogleTTSLanguage } from '@vocably/model';
 import { isGoodPlural, sanitizeTranscript } from '@vocably/sulna';
 import React, { FC, useEffect, useRef, useState } from 'react';
-import { PixelRatio, Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Text, useTheme } from 'react-native-paper';
 import { CardExample, CardExampleRef } from '../../CardExample';
+import { isolate } from '../../isolate';
 import { PlaySound, PlaySoundRef } from '../../PlaySound';
 import { studySmallFontSize } from '../../styles';
 
@@ -52,14 +53,12 @@ export const CardFront: FC<Props> = ({
     setIsAutoPlayed(true);
   }, [isAutoPlayed, autoPlay]);
 
-  const fontScale = PixelRatio.getFontScale();
-
   const present = card.data.presentTenses
-    ? t('common.presentTenses', { value: card.data.presentTenses })
+    ? t('common.presentTenses', { value: isolate(card.data.presentTenses) })
     : false;
   const past =
     card.data.tense === 'present' && card.data.pastTenses
-      ? t('common.pastTenses', { value: card.data.pastTenses })
+      ? t('common.pastTenses', { value: isolate(card.data.pastTenses) })
       : false;
 
   const presentAndPast = [present, past].filter(Boolean).join(`\n`);
@@ -68,47 +67,31 @@ export const CardFront: FC<Props> = ({
     <View>
       <View
         style={{
-          display: 'flex',
           flexDirection: 'row',
-          alignItems: 'baseline',
           flexWrap: 'wrap',
+          alignItems: 'center',
+          columnGap: 8,
           width: '100%',
+          // Keep LTR order even when the card is in an RTL language.
+          direction: 'ltr',
         }}
       >
+        {isGoogleTTSLanguage(card.data.language) && (
+          <PlaySound
+            text={card.data.source}
+            language={card.data.language}
+            size={24}
+            ref={playRef}
+          />
+        )}
         <Text
           style={{
-            fontSize: 18,
-            textAlignVertical: 'top',
+            fontSize: 32,
+            color: theme.colors.secondary,
+            flexShrink: 1,
           }}
         >
-          {isGoogleTTSLanguage(card.data.language) && (
-            <>
-              <PlaySound
-                text={card.data.source}
-                language={card.data.language}
-                size={24}
-                ref={playRef}
-                style={{
-                  transform: [
-                    {
-                      translateY:
-                        Platform.OS === 'ios'
-                          ? -1 * fontScale
-                          : 5 * 1.2 * fontScale,
-                    },
-                  ],
-                }}
-              />{' '}
-            </>
-          )}
-          <Text
-            style={{
-              fontSize: 32,
-              color: theme.colors.secondary,
-            }}
-          >
-            {card.data.source}
-          </Text>
+          {card.data.source}
         </Text>
       </View>
       {(card.data.ipa ||
@@ -122,10 +105,11 @@ export const CardFront: FC<Props> = ({
             marginLeft: 8,
             marginTop: 6,
             gap: 8,
+            direction: 'ltr',
           }}
         >
           {card.data.ipa && <Text>/{sanitizeTranscript(card.data.ipa)}/</Text>}
-          {card.data.g && <Text>({card.data.g})</Text>}
+          {card.data.g && <Text>({isolate(card.data.g)})</Text>}
           {card.data.partOfSpeech && (
             <Text>
               {t(`language.${card.data.partOfSpeech}`, card.data.partOfSpeech)}
@@ -137,7 +121,7 @@ export const CardFront: FC<Props> = ({
             isGoodPlural(card.data.pluralForm) && (
               <Text>
                 {t('common.plural', {
-                  value: card.data.pluralForm,
+                  value: isolate(card.data.pluralForm),
                 })}
               </Text>
             )}
