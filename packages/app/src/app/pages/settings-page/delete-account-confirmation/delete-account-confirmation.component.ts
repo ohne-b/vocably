@@ -1,7 +1,8 @@
 import { CdkScrollable } from '@angular/cdk/scrolling';
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import {
+  MAT_DIALOG_DATA,
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
@@ -9,6 +10,10 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { TranslocoModule } from '@jsverse/transloco';
+
+export type DeleteAccountConfirmationData = {
+  email: string;
+};
 
 @Component({
   selector: 'app-delete-account-confirmation',
@@ -25,7 +30,10 @@ import { TranslocoModule } from '@jsverse/transloco';
   ],
 })
 export class DeleteAccountConfirmationComponent implements OnInit {
-  constructor(public dialogRef: MatDialogRef<void>) {}
+  constructor(
+    public dialogRef: MatDialogRef<void>,
+    @Inject(MAT_DIALOG_DATA) public data: DeleteAccountConfirmationData
+  ) {}
 
   onNoClick(): void {
     this.dialogRef.close();

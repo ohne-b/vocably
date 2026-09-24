@@ -286,10 +286,11 @@ export const vi = {
   'settings.feature_prompts': 'Tạo bộ sưu tập theo yêu cầu',
   'settings.scan_qr': 'Quét mã QR để cài đặt:',
   'settings.interface_language': 'Ngôn ngữ giao diện',
+  'settings.signed_in_as': 'Đã đăng nhập với {{email}}',
   'settings.delete_account': 'Xóa tài khoản của tôi',
   'settings.delete_dialog.title': 'Xóa tài khoản',
   'settings.delete_dialog.confirm':
-    'Bạn có chắc muốn xóa tài khoản? Hành động này không thể hoàn tác.',
+    'Bạn có chắc muốn xóa tài khoản {{email}}? Hành động này không thể hoàn tác.',
   'settings.delete_dialog.yes': 'Có',
   'settings.delete_dialog.no': 'Không, cảm ơn',
   'settings.study_steps.title': 'Các bước học',

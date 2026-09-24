@@ -295,10 +295,11 @@ export const uk = {
   'settings.feature_prompts': 'Генерація колекцій за запитом',
   'settings.scan_qr': 'Відскануйте QR-код для встановлення:',
   'settings.interface_language': 'Мова інтерфейсу',
+  'settings.signed_in_as': 'Ви увійшли як {{email}}',
   'settings.delete_account': 'Видалити мій акаунт',
   'settings.delete_dialog.title': 'Видалити акаунт',
   'settings.delete_dialog.confirm':
-    'Ви впевнені, що хочете видалити свій акаунт? Цю дію не можна скасувати.',
+    'Ви впевнені, що хочете видалити акаунт {{email}}? Цю дію не можна скасувати.',
   'settings.delete_dialog.yes': 'Так',
   'settings.delete_dialog.no': 'Ні, дякую',
   'settings.study_steps.title': 'Етапи навчання',

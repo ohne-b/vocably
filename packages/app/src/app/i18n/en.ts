@@ -290,10 +290,11 @@ export const en = {
   'settings.feature_prompts': 'Prompt-Based Collections Generation',
   'settings.scan_qr': 'Scan the QR code to install:',
   'settings.interface_language': 'Interface language',
+  'settings.signed_in_as': 'Signed in as {{email}}',
   'settings.delete_account': 'Delete my account',
   'settings.delete_dialog.title': 'Delete My Account',
   'settings.delete_dialog.confirm':
-    'Are you sure you want to delete your account? This action cannot be undone.',
+    'Are you sure you want to delete the account {{email}}? This action cannot be undone.',
   'settings.delete_dialog.yes': 'Yes',
   'settings.delete_dialog.no': 'No, thanks',
   'settings.study_steps.title': 'Study Steps',

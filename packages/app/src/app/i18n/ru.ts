@@ -297,10 +297,11 @@ export const ru = {
   'settings.feature_prompts': 'Генерация коллекций по запросу',
   'settings.scan_qr': 'Отсканируйте QR-код для установки:',
   'settings.interface_language': 'Язык интерфейса',
+  'settings.signed_in_as': 'Вы вошли как {{email}}',
   'settings.delete_account': 'Удалить мой аккаунт',
   'settings.delete_dialog.title': 'Удалить аккаунт',
   'settings.delete_dialog.confirm':
-    'Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.',
+    'Вы уверены, что хотите удалить аккаунт {{email}}? Это действие нельзя отменить.',
   'settings.delete_dialog.yes': 'Да',
   'settings.delete_dialog.no': 'Нет, спасибо',
   'settings.study_steps.title': 'Этапы обучения',

@@ -297,10 +297,11 @@ export const tr = {
   'settings.feature_prompts': 'İstem Tabanlı Koleksiyon Oluşturma',
   'settings.scan_qr': 'Yüklemek için QR kodu tarayın:',
   'settings.interface_language': 'Arayüz dili',
+  'settings.signed_in_as': '{{email}} olarak giriş yapıldı',
   'settings.delete_account': 'Hesabımı sil',
   'settings.delete_dialog.title': 'Hesabımı Sil',
   'settings.delete_dialog.confirm':
-    'Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
+    '{{email}} hesabını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
   'settings.delete_dialog.yes': 'Evet',
   'settings.delete_dialog.no': 'Hayır, teşekkürler',
   'settings.study_steps.title': 'Çalışma Adımları',

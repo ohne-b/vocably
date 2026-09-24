@@ -6,15 +6,21 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
+import { AsyncPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { deleteUser } from 'aws-amplify/auth';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { IonicModule } from '@ionic/angular';
 import { saveUserMetadata } from '@vocably/api';
 import { Locale } from '@vocably/model';
+import { firstValueFrom, map } from 'rxjs';
+import { AuthService } from '../../auth/auth.service';
 import { LoaderService } from '../../components/loader.service';
 import { HeaderComponent } from '../../header/header.component';
-import { DeleteAccountConfirmationComponent } from './delete-account-confirmation/delete-account-confirmation.component';
+import {
+  DeleteAccountConfirmationComponent,
+  DeleteAccountConfirmationData,
+} from './delete-account-confirmation/delete-account-confirmation.component';
 import {
   getStudySettings,
   setStudySettings,
@@ -40,11 +46,13 @@ import { StudyStepsComponent } from './study-steps/study-steps.component';
     AppQrCodeComponent,
     StudyStepsComponent,
     TranslocoModule,
+    AsyncPipe,
   ],
 })
 export class SettingsPageComponent implements OnInit {
   studySettings: StudySettings = { cardsPerSession: 10, random: false };
   interfaceLanguage: Locale = 'en';
+  email$ = this.auth.userData$.pipe(map((userData) => userData.email));
 
   readonly languages: { value: Locale; label: string }[] = [
     { value: 'en', label: 'English' },
@@ -59,7 +67,8 @@ export class SettingsPageComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     public loader: LoaderService,
-    private transloco: TranslocoService
+    private transloco: TranslocoService,
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -76,8 +85,13 @@ export class SettingsPageComponent implements OnInit {
     setStudySettings(this.studySettings);
   }
 
-  deleteAccount() {
-    const dialogRef = this.dialog.open(DeleteAccountConfirmationComponent);
+  async deleteAccount() {
+    const data: DeleteAccountConfirmationData = {
+      email: await firstValueFrom(this.email$),
+    };
+    const dialogRef = this.dialog.open(DeleteAccountConfirmationComponent, {
+      data,
+    });
 
     dialogRef.afterClosed().subscribe(async (result) => {
       if (result !== true) {

@@ -296,10 +296,11 @@ export const es = {
   'settings.feature_prompts': 'Generación de colecciones por indicaciones',
   'settings.scan_qr': 'Escanea el código QR para instalar:',
   'settings.interface_language': 'Idioma de la interfaz',
+  'settings.signed_in_as': 'Sesión iniciada como {{email}}',
   'settings.delete_account': 'Eliminar mi cuenta',
   'settings.delete_dialog.title': 'Eliminar mi cuenta',
   'settings.delete_dialog.confirm':
-    '¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.',
+    '¿Estás seguro de que quieres eliminar la cuenta {{email}}? Esta acción no se puede deshacer.',
   'settings.delete_dialog.yes': 'Sí',
   'settings.delete_dialog.no': 'No, gracias',
   'settings.study_steps.title': 'Pasos de estudio',

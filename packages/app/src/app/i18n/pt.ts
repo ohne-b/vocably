@@ -292,10 +292,11 @@ export const pt = {
   'settings.feature_prompts': 'Geração de coleções por comandos',
   'settings.scan_qr': 'Escaneie o código QR para instalar:',
   'settings.interface_language': 'Idioma da interface',
+  'settings.signed_in_as': 'Conectado como {{email}}',
   'settings.delete_account': 'Excluir minha conta',
   'settings.delete_dialog.title': 'Excluir minha conta',
   'settings.delete_dialog.confirm':
-    'Tem certeza de que deseja excluir sua conta? Esta ação não pode ser desfeita.',
+    'Tem certeza de que deseja excluir a conta {{email}}? Esta ação não pode ser desfeita.',
   'settings.delete_dialog.yes': 'Sim',
   'settings.delete_dialog.no': 'Não, obrigado',
   'settings.study_steps.title': 'Etapas de estudo',
