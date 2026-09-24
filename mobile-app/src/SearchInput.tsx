@@ -130,6 +130,7 @@ export const SearchInput = forwardRef<SearchInputRef, Props>(
         {pasteFromClipboard && !value && clipboardHasText && (
           <IconButton
             icon={'content-paste'}
+            disabled={disabled}
             mode="contained"
             iconColor={theme.colors.inputIconColor}
             onPress={setTextFromClipboard}
@@ -140,6 +141,7 @@ export const SearchInput = forwardRef<SearchInputRef, Props>(
         {value && (
           <IconButton
             icon={'close-circle'}
+            disabled={disabled}
             mode="contained"
             iconColor={theme.colors.inputIconColor}
             onPress={() => {
@@ -152,6 +154,7 @@ export const SearchInput = forwardRef<SearchInputRef, Props>(
         )}
         <IconButton
           icon={'magnify'}
+          disabled={disabled}
           mode="contained"
           iconColor={theme.colors.inputIconColor}
           style={{
