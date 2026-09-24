@@ -44,6 +44,10 @@ export const SearchInput = forwardRef<SearchInputRef, Props>(
     const focusAnimation = useRef(new Animated.Value(0)).current;
 
     const handleFocus = () => {
+      if (pasteFromClipboard) {
+        Clipboard.hasString().then(setClipboardHasText);
+      }
+
       Animated.timing(focusAnimation, {
         toValue: 1,
         duration: 300,
@@ -78,8 +82,6 @@ export const SearchInput = forwardRef<SearchInputRef, Props>(
         }
       },
     }));
-
-    Clipboard.hasString().then((hasText) => setClipboardHasText(hasText));
 
     const setTextFromClipboard = async () => {
       const clipboardText = await Clipboard.getString();
