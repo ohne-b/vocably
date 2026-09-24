@@ -15,3 +15,6 @@
   (oneMoreRound)="oneMoreRound.emit()"
   @displayComponent
 ></app-srs-success>
+<div class="saving" *ngIf="cards.length === 0 && saving">
+  <ion-spinner name="dots"></ion-spinner>
+</div>

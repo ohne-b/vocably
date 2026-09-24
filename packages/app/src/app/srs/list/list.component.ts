@@ -10,6 +10,7 @@ import {
 import { NgFor, NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CardItem, StudyFlowType } from '@vocably/model';
+import { IonicModule } from '@ionic/angular';
 import { SrsScore } from '@vocably/srs';
 import { Subject } from 'rxjs';
 import { GradeComponent } from '../grade/grade.component';
@@ -35,7 +36,7 @@ export type GradeResult = {
       ]),
     ]),
   ],
-  imports: [NgFor, GradeComponent, NgIf, SuccessComponent],
+  imports: [NgFor, GradeComponent, NgIf, SuccessComponent, IonicModule],
 })
 export class ListComponent {
   @Input() allCards!: CardItem[];
