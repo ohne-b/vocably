@@ -62,6 +62,7 @@ export const setContents = async ({
     translation.canCongratulate =
       contentScriptConfiguration.allowFirstTranslationCongratulation &&
       !userKnowsHowToAdd;
+    translation.isLoggedInUser = true;
 
     type AnalyzePayload = {
       sourceLanguage?: GoogleLanguage;
