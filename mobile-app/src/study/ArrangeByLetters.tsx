@@ -23,6 +23,7 @@ import {
 import { ReverseCardFront, ReverseCardFrontRef } from './Card/ReverseCardFront';
 import { Displayer, DisplayerRef } from './Displayer';
 import { PlaySound, PlaySoundRef } from '../PlaySound';
+import { isRtlText } from '../isRtlText';
 
 type Props = {
   card: CardItem;
@@ -48,6 +49,7 @@ export const ArrangeByLetters: FC<Props> = ({
   const [isCorrect, setIsCorrect] = useState(false);
 
   const correctString = card.data.source.toUpperCase();
+  const isRtl = isRtlText(correctString);
   const lettersRef = useRef<string[]>(shuffle(correctString.split('')));
   const [answer, setAnswer] = useState<Array<number | false>>(
     lettersRef.current.map(() => false)
@@ -230,7 +232,7 @@ export const ArrangeByLetters: FC<Props> = ({
         <Animated.View
           style={[
             {
-              flexDirection: 'row',
+              flexDirection: isRtl ? 'row-reverse' : 'row',
               alignItems: 'center',
               justifyContent: 'center',
               flexWrap: 'wrap',
@@ -285,7 +287,7 @@ export const ArrangeByLetters: FC<Props> = ({
           mode="flat"
           style={{
             alignSelf: 'center',
-            flexDirection: 'row',
+            flexDirection: isRtl ? 'row-reverse' : 'row',
             alignItems: 'center',
             justifyContent: 'center',
             flexWrap: 'wrap',
