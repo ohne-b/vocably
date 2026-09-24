@@ -233,7 +233,7 @@ export const StudySteps: FC<Props> = ({ style, scrollableRef }) => {
                       navigation.navigate('PreviewStudyStepModal', {
                         card: previewStep.card,
                         step: previewStep.step,
-                        deckSettings: deckSettings,
+                        deckSettings: deckSettings ?? {},
                       });
                     }}
                   >
@@ -294,7 +294,16 @@ export const StudySteps: FC<Props> = ({ style, scrollableRef }) => {
         </CustomSurface>
       );
     },
-    [isPremium, presentPaywall]
+    [
+      isPremium,
+      presentPaywall,
+      previewOptions,
+      deckSettings,
+      changeIsEnabled,
+      studyFlow,
+      theme,
+      t,
+    ]
   );
 
   const onDragEnd: SortableGridDragEndCallback<StudyFlowType> = ({ data }) => {
