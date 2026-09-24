@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, resource } from '@angular/core';
+import { Component, OnDestroy, OnInit, resource, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoModule } from '@jsverse/transloco';
 import { IonicModule } from '@ionic/angular';
@@ -15,7 +15,7 @@ import {
   grade,
   slice,
 } from '@vocably/srs';
-import { Subject, takeUntil, tap } from 'rxjs';
+import { finalize, mergeMap, Subject, takeUntil } from 'rxjs';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { GradeResult, ListComponent } from '../../../srs/list/list.component';
 import { DeckStoreService } from '../../deck-store.service';
@@ -50,6 +50,7 @@ import { filterByTags } from '../../../../filterByTags';
 export class StudyPageComponent implements OnInit, OnDestroy {
   public cards: CardItem[] = [];
   public total = 0;
+  public pendingSaves = signal(0);
 
   private destroy$ = new Subject();
 
@@ -171,10 +172,12 @@ export class StudyPageComponent implements OnInit, OnDestroy {
       gradeResult.cardItem.created
     );
 
+    this.pendingSaves.update((count) => count + 1);
+
     this.deckService
       .update(gradeResult.cardItem.id, item)
       .pipe(
-        tap(async (saveResult) => {
+        mergeMap(async (saveResult) => {
           if (saveResult.success === false) {
             this.showSaveError();
             return;
@@ -194,7 +197,8 @@ export class StudyPageComponent implements OnInit, OnDestroy {
           }
 
           saveLastStudyStreak(increaseResult.value);
-        })
+        }),
+        finalize(() => this.pendingSaves.update((count) => count - 1))
       )
       .pipe(takeUntil(this.destroy$))
       .subscribe();

@@ -11,7 +11,7 @@
   <div class="grade-nav">{{ total - cards.length + 1 }} / {{ total }}</div>
 </div>
 <app-srs-success
-  *ngIf="cards.length === 0"
+  *ngIf="cards.length === 0 && !saving"
   (oneMoreRound)="oneMoreRound.emit()"
   @displayComponent
 ></app-srs-success>

@@ -23,6 +23,7 @@
       [allCards]="allCards"
       [cards]="cards"
       [total]="total"
+      [saving]="pendingSaves() > 0"
       [prerenderedCards]="necessaryData.value().predefinedCards"
       (grade)="onGrade($event)"
       (oneMoreRound)="reloadCards()"
