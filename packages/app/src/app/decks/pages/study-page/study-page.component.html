@@ -24,6 +24,7 @@
       [cards]="cards"
       [total]="total"
       [saving]="pendingSaves() > 0"
+      [studyStreak]="studyStreak"
       [prerenderedCards]="necessaryData.value().predefinedCards"
       (grade)="onGrade($event)"
       (oneMoreRound)="reloadCards()"

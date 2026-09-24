@@ -9,7 +9,7 @@ import {
 } from '@angular/animations';
 import { NgFor, NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CardItem, StudyFlowType } from '@vocably/model';
+import { CardItem, StudyFlowType, StudyStreak } from '@vocably/model';
 import { IonicModule } from '@ionic/angular';
 import { SrsScore } from '@vocably/srs';
 import { Subject } from 'rxjs';
@@ -45,6 +45,7 @@ export class ListComponent {
   @Input() cards!: CardItem[];
   @Input() total = 0;
   @Input() saving = false;
+  @Input() studyStreak!: StudyStreak | null;
   @Output() grade = new EventEmitter<GradeResult>();
   @Output() oneMoreRound = new EventEmitter();
 

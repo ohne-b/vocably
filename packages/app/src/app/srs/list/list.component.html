@@ -13,6 +13,7 @@
 <app-srs-success
   *ngIf="cards.length === 0 && !saving"
   (oneMoreRound)="oneMoreRound.emit()"
+  [studyStreak]="studyStreak"
   @displayComponent
 ></app-srs-success>
 <div class="saving" *ngIf="cards.length === 0 && saving">

@@ -3,11 +3,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslocoModule } from '@jsverse/transloco';
 import { IonicModule } from '@ionic/angular';
 import {
+  fetchStudyStreak,
   getUserMetadata,
   getUserStaticMetadata,
   publicPredefinedOptions,
 } from '@vocably/api';
-import { CardItem, GoogleLanguage, isGoogleLanguage } from '@vocably/model';
+import {
+  CardItem,
+  GoogleLanguage,
+  isGoogleLanguage,
+  StudyStreak,
+} from '@vocably/model';
 import {
   craftTheStrategy,
   defaultStudyFlow,
@@ -23,10 +29,6 @@ import { DeckService } from '../../deck.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AlertComponent } from '../../../components/alert/alert.component';
 import { increaseStudyStreak } from '../../../../increaseStudyStreak';
-import {
-  getLastStudyStreak,
-  saveLastStudyStreak,
-} from '../../../localStudyStreak';
 import { dateToString, timeout } from '@vocably/sulna';
 import { AuthService } from '../../../auth/auth.service';
 import { getStudySettings } from '../../../../study-settings';
@@ -51,6 +53,8 @@ export class StudyPageComponent implements OnInit, OnDestroy {
   public cards: CardItem[] = [];
   public total = 0;
   public pendingSaves = signal(0);
+
+  public studyStreak: StudyStreak | null = null;
 
   private destroy$ = new Subject();
 
@@ -184,9 +188,19 @@ export class StudyPageComponent implements OnInit, OnDestroy {
           }
 
           const today = dateToString(new Date());
-          const lastStudyStreak = getLastStudyStreak();
 
-          if (lastStudyStreak.lastStudyDay === today) {
+          if (!this.studyStreak) {
+            const studyStreakResult = await fetchStudyStreak();
+            if (studyStreakResult.success) {
+              this.studyStreak = studyStreakResult.value;
+            }
+          }
+
+          if (!this.studyStreak) {
+            return;
+          }
+
+          if (this.studyStreak.lastStudyDay === today) {
             return;
           }
 
@@ -195,8 +209,7 @@ export class StudyPageComponent implements OnInit, OnDestroy {
             this.showSaveError();
             return;
           }
-
-          saveLastStudyStreak(increaseResult.value);
+          this.studyStreak = increaseResult.value;
         }),
         finalize(() => this.pendingSaves.update((count) => count - 1))
       )

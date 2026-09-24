@@ -1,7 +1,7 @@
-@if (lastStreak.days > 0) {
+@if (studyStreak && studyStreak.days > 0) {
   <app-srs-streak
     style="margin-bottom: 2rem"
-    [consecutiveDays]="lastStreak.days"
+    [consecutiveDays]="studyStreak.days"
     [hasBeenShown]="streakAnimationShown"
   ></app-srs-streak>
 } @else {
@@ -16,7 +16,7 @@
   >
 }
 <div class="text-center">
-  <button class="button outline" (click)="oneMoreRound.emit()">
+  <button mat-button color="accent" (click)="oneMoreRound.emit()">
     {{ 'srs.success.one_more' | transloco }}
   </button>
 </div>
