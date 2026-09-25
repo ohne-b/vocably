@@ -12,13 +12,6 @@ export type AssetFormat = {
 // https://support.google.com/googleplay/android-developer/answer/9866151
 export const formats: AssetFormat[] = [
   {
-    id: 'ios-iphone-6.9',
-    store: 'app-store',
-    name: 'iPhone 6.9"',
-    width: 1320,
-    height: 2868,
-  },
-  {
     id: 'ios-iphone-6.5',
     store: 'app-store',
     name: 'iPhone 6.5"',
