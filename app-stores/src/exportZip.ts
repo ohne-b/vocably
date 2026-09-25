@@ -3,6 +3,8 @@ import { toBlob } from 'html-to-image';
 import type { AssetFormat } from './formats';
 
 const renderPng = async (node: HTMLElement, format: AssetFormat) => {
+  // Web fonts that are still loading would fall back in the PNG.
+  await document.fonts.ready;
   const blob = await toBlob(node, {
     width: format.width,
     height: format.height,

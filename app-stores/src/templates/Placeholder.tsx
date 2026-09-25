@@ -18,9 +18,9 @@ export const Placeholder = ({ format, label }: Props) => {
         alignItems: 'center',
         justifyContent: 'center',
         gap: minSide * 0.02,
-        background: 'linear-gradient(160deg, #4f46e5, #0ea5e9)',
-        color: '#fff',
-        fontFamily: 'system-ui, sans-serif',
+        background: '#fff',
+        color: '#000',
+        fontFamily: "'Cormorant Garamond', serif",
       }}
     >
       <div style={{ fontSize: minSide * 0.1, fontWeight: 700 }}>Vocably</div>
