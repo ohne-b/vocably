@@ -21,6 +21,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import OpenAI from 'openai';
+import { timeout } from '@vocably/sulna';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 // loadEnvFile is available in Node 20.12+, but the installed @types/node lags behind.
@@ -31,6 +32,7 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const BASE_URL = 'https://hemmingway.io/v1';
 const MODEL = 'hemmingway-27b';
 const JSON_CHUNK_SIZE = 80;
+const REQUEST_TIMEOUT_MS = 90_000;
 
 const [filePathArg, languageArg] = process.argv.slice(2);
 
@@ -126,17 +128,34 @@ const withElapsedTime = async <T,>(label: string, promise: Promise<T>) => {
 };
 
 const complete = async (system: string, user: string, json: boolean) => {
+  const abortController = new AbortController();
   const response = await withElapsedTime(
     'Waiting for Hemmingway...',
-    openai.chat.completions.create({
-      model: MODEL,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ],
-      ...(json ? { response_format: { type: 'json_object' as const } } : {}),
-    })
-  );
+    timeout(
+      openai.chat.completions.create(
+        {
+          model: MODEL,
+          messages: [
+            { role: 'system', content: system },
+            { role: 'user', content: user },
+          ],
+          ...(json
+            ? { response_format: { type: 'json_object' as const } }
+            : {}),
+        },
+        { signal: abortController.signal }
+      ),
+      abortController,
+      REQUEST_TIMEOUT_MS
+    )
+  ).catch((error) => {
+    if (abortController.signal.aborted) {
+      throw new Error(
+        `Hemmingway did not respond within ${REQUEST_TIMEOUT_MS / 1000}s.`
+      );
+    }
+    throw error;
+  });
 
   const content = response.choices[0]?.message?.content;
   if (!content) {

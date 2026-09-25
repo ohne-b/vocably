@@ -60,8 +60,8 @@ export const Languages = ({
       style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${columns}, ${size}px)`,
-        columnGap: size * 0.25,
-        rowGap: size * (names ? 0.18 : 0.25),
+        columnGap: size * 0.32,
+        rowGap: size * (names ? 0.22 : 0.32),
         justifyContent: 'center',
       }}
     >
