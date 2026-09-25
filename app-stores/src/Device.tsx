@@ -1,9 +1,12 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import { Canvas } from './Canvas';
-import type { AssetFormat } from './formats';
+import { type AssetFormat } from './formats';
 import { languageNames, languages, type Language } from './languages';
 
 const PREVIEW_HEIGHT = 480;
+
+const previewScale = (format: AssetFormat) =>
+  Math.min(PREVIEW_HEIGHT / format.height, 1);
 
 const FormatContext = createContext<AssetFormat | null>(null);
 
@@ -32,7 +35,17 @@ export const Device = ({
         <h3>
           {languageNames[language]} <small>{language}</small>
         </h3>
-        <div className="screenshots">{children(language)}</div>
+        <div
+          className="screenshots"
+          // Space the previews like the store does, so panoramas line up.
+          style={
+            format.gap === undefined
+              ? undefined
+              : { gap: format.gap * previewScale(format) }
+          }
+        >
+          {children(language)}
+        </div>
       </section>
     ))}
   </FormatContext>
@@ -42,10 +55,9 @@ export const Device = ({
 export const Screenshot = ({ children }: { children: ReactNode }) => {
   const format = useContext(FormatContext);
   if (!format) throw new Error('<Screenshot> must be used inside <Device>');
-  const scale = Math.min(PREVIEW_HEIGHT / format.height, 1);
 
   return (
-    <Canvas format={format} scale={scale}>
+    <Canvas format={format} scale={previewScale(format)}>
       {children}
     </Canvas>
   );

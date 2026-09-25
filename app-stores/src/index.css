@@ -105,6 +105,7 @@ body {
 
 .screenshots {
   display: flex;
-  flex-wrap: wrap;
   gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 24px;
 }
