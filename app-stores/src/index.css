@@ -86,3 +86,25 @@ body {
 .toolbar button:disabled {
   opacity: 0.6;
 }
+
+.device {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.language-group h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.language-group h3 small {
+  color: #9ca3af;
+  font-weight: normal;
+}
+
+.screenshots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}

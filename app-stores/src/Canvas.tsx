@@ -1,16 +1,16 @@
-import type { ReactNode, Ref } from 'react';
+import type { ReactNode } from 'react';
 import type { AssetFormat } from './formats';
 
 type Props = {
   format: AssetFormat;
   scale: number;
-  ref?: Ref<HTMLDivElement>;
   children: ReactNode;
 };
 
 // Renders children at the exact pixel size of the format,
 // visually scaled down to fit the preview area.
-export const Canvas = ({ format, scale, ref, children }: Props) => (
+// `data-canvas` marks the unscaled node that exportZip captures.
+export const Canvas = ({ format, scale, children }: Props) => (
   <div
     style={{
       width: format.width * scale,
@@ -20,7 +20,7 @@ export const Canvas = ({ format, scale, ref, children }: Props) => (
     }}
   >
     <div
-      ref={ref}
+      data-canvas
       style={{
         width: format.width,
         height: format.height,

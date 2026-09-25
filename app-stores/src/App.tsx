@@ -1,31 +1,30 @@
 import { useRef, useState } from 'react';
-import { Canvas } from './Canvas';
-import { exportPng } from './exportPng';
+import { devices } from './devices';
+import { exportZip } from './exportZip';
 import { formats, type Store } from './formats';
-import { Placeholder } from './templates/Placeholder';
 
 const storeNames: Record<Store, string> = {
   'app-store': 'App Store',
   'google-play': 'Google Play',
 };
 
-const PREVIEW_HEIGHT = 720;
-
 export const App = () => {
   const [formatId, setFormatId] = useState(formats[0].id);
-  const [isExporting, setIsExporting] = useState(false);
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState<string | null>(null);
+  const screenshotsRef = useRef<HTMLDivElement>(null);
 
   const format = formats.find((f) => f.id === formatId) ?? formats[0];
-  const scale = Math.min(PREVIEW_HEIGHT / format.height, 1);
+  const DeviceScreenshots = devices[format.id];
 
   const onExport = async () => {
-    if (!canvasRef.current) return;
-    setIsExporting(true);
+    if (!screenshotsRef.current) return;
+    setProgress('Exporting…');
     try {
-      await exportPng(canvasRef.current, format);
+      await exportZip(screenshotsRef.current, format, (done, total) =>
+        setProgress(`Exporting ${done}/${total}…`)
+      );
     } finally {
-      setIsExporting(false);
+      setProgress(null);
     }
   };
 
@@ -57,13 +56,13 @@ export const App = () => {
           <span>
             {storeNames[format.store]} · {format.name}
           </span>
-          <button onClick={onExport} disabled={isExporting}>
-            {isExporting ? 'Exporting…' : 'Export PNG'}
+          <button onClick={onExport} disabled={progress !== null}>
+            {progress ?? 'Download ZIP'}
           </button>
         </div>
-        <Canvas ref={canvasRef} format={format} scale={scale}>
-          <Placeholder format={format} />
-        </Canvas>
+        <div ref={screenshotsRef} className="device">
+          <DeviceScreenshots />
+        </div>
       </main>
     </div>
   );

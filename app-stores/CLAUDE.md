@@ -4,7 +4,7 @@ Guidance for Claude Code when working in `app-stores/`.
 
 ## What this is
 
-An internal, local-only tool for making Vocably's store assets: App Store and Google Play screenshots, the Play feature graphic, and app icons. You pick a format in the sidebar, the template renders at that format's exact pixel size, and **Export PNG** downloads the image.
+An internal, local-only tool for making Vocably's store assets: App Store and Google Play screenshots, the Play feature graphic, and app icons. You pick a format in the sidebar, its device component renders every screenshot at the format's exact pixel size, grouped by language, and **Download ZIP** downloads `<id>.zip` with one folder per language (`en/01.png`, `en/02.png`, …).
 
 It is a standalone Vite + React 19 + TypeScript app. It is **not** an npm workspace of the monorepo (the root `workspaces` only covers `packages/*`), so:
 
@@ -24,22 +24,25 @@ npm run lint         # oxlint (config in .oxlintrc.json)
 npm run preview      # serve the dist/ build
 ```
 
-There is no `dev` script; the dev server script is named `app-stores`. The README's `npm run dev` is out of date. There are no tests.
+There is no `dev` script; the dev server script is named `app-stores`. There are no tests.
 
 ## Structure
 
-- `src/formats/index.ts`: `AssetFormat` list (id, store, name, width, height). The pixel sizes follow Apple's and Google's specs, which are linked in the file. `id` becomes the exported file name (`<id>.png`).
+- `src/formats/index.ts`: `AssetFormat` list (id, store, name, width, height) and `getFormat(id)`. The pixel sizes follow Apple's and Google's specs, which are linked in the file. `id` becomes the exported ZIP name (`<id>.zip`).
+- `src/languages.ts`: the interface languages. The code becomes the folder name in the ZIP.
+- `src/devices/`: one component per format (`IPhone65`, `IPad13`, `PlayPhone`, …), mapped by format id in `devices/index.ts`. Each renders `<Device format={format}>{(language) => <Screenshot>…</Screenshot>}</Device>`.
+- `src/Device.tsx`: `Device` renders one `data-language` group per language (all of them by default, or pass `languages`). `Screenshot` is one exported PNG; screenshots are numbered in render order within their group.
 - `src/templates/`: the asset designs. Right now there is only `Placeholder.tsx`. A template receives `format` and fills 100% of the canvas.
-- `src/Canvas.tsx`: renders its children at the format's full size, then uses a CSS `transform: scale()` to shrink them for the preview.
-- `src/App.tsx`: the sidebar, the toolbar and the export button. The preview fits in `PREVIEW_HEIGHT` (720px), and formats smaller than that are never scaled up.
-- `src/exportPng.ts`: `html-to-image`'s `toPng` on the unscaled node. It uses `pixelRatio: 1` and overrides the style to `transform: none`, then downloads the image through a temporary `<a download>`.
+- `src/Canvas.tsx`: renders its children at the format's full size in a `data-canvas` node, then uses a CSS `transform: scale()` to shrink them for the preview. Screenshots are previewed at `PREVIEW_HEIGHT` (480px, in `Device.tsx`), and formats smaller than that are never scaled up.
+- `src/App.tsx`: the sidebar, the toolbar and the download button.
+- `src/exportZip.ts`: captures every `[data-canvas]` inside each `[data-language]` group, one at a time, with `html-to-image`'s `toBlob` (`pixelRatio: 1`, style overridden to `transform: none`), zips them with `fflate` (stored, not recompressed) and downloads through a temporary `<a download>`.
 
 ## Conventions for templates
 
 - Size things relative to the format, not in fixed px. `Placeholder` uses `minSide = Math.min(width, height)` and multiplies from it, so one design works across every aspect ratio.
 - Use inline styles or `index.css`. What you see is what html-to-image captures.
-- Choose a template per format or per store in `App.tsx`, where `<Placeholder>` is rendered now.
-- To add a format, add an entry to `formats`. The sidebar groups entries by `store` automatically.
+- Put the screenshots of a format in its device component. The `language` argument decides the per-language content; the order of `<Screenshot>`s is the order in the store.
+- To add a format, add an entry to `formats`, create a component in `src/devices/` and register it in `devices/index.ts`. The sidebar groups entries by `store` automatically.
 
 ## Debugging
 
@@ -52,8 +55,10 @@ There is no `dev` script; the dev server script is named `app-stores`. The READM
 - **Scaling artifacts:** the export relies on overriding `transform` to `none`. If a template puts its own `transform` on the root node, the override will clobber it, so wrap the content in an inner element instead.
 - **Clipping:** the canvas has `overflow: hidden`, so anything outside `width × height` gets cut off in both the preview and the export.
 
-**Checking the output:** the exported file should match the format's size exactly. Check it with `sips -g pixelWidth -g pixelHeight ~/Downloads/<id>.png` (macOS). A wrong size usually means someone changed `pixelRatio` or the width/height options in `exportPng.ts`.
+**Checking the output:** the exported file should match the format's size exactly. Check it with `unzip ~/Downloads/<id>.zip -d /tmp/<id> && sips -g pixelWidth -g pixelHeight /tmp/<id>/en/01.png` (macOS). A wrong size usually means someone changed `pixelRatio` or the width/height options in `exportZip.ts`.
 
-**Export does nothing or throws:** look at the browser console. `toPng` rejects on resource loading errors. The button's `finally` resets the state, but the error is not shown in the UI.
+**Export hangs at 0/N:** html-to-image stalls in a hidden tab (e.g. a Chrome window driven in the background). Keep the tab visible, or run it in headless Chrome.
+
+**Export does nothing or throws:** look at the browser console. `toBlob` rejects on resource loading errors. The button's `finally` resets the state, but the error is not shown in the UI.
 
 **Type and lint errors:** `npm run build` runs `tsc -b` against `tsconfig.app.json` (strict unused locals/params, `verbatimModuleSyntax`, which means type-only imports must use `import type`). `npm run lint` runs oxlint.

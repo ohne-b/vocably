@@ -61,3 +61,9 @@ export const formats: AssetFormat[] = [
     height: 512,
   },
 ];
+
+export const getFormat = (id: string) => {
+  const format = formats.find((f) => f.id === id);
+  if (!format) throw new Error(`Unknown format: ${id}`);
+  return format;
+};
