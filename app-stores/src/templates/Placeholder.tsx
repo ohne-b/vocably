@@ -1,11 +1,13 @@
+import type { ReactNode } from 'react';
 import type { AssetFormat } from '../formats';
 
 type Props = {
   format: AssetFormat;
   label?: string;
+  children?: ReactNode;
 };
 
-export const Placeholder = ({ format, label }: Props) => {
+export const Placeholder = ({ format, label, children }: Props) => {
   const minSide = Math.min(format.width, format.height);
 
   return (
@@ -27,9 +29,7 @@ export const Placeholder = ({ format, label }: Props) => {
       {label && (
         <div style={{ fontSize: minSide * 0.05, fontWeight: 600 }}>{label}</div>
       )}
-      <div style={{ fontSize: minSide * 0.035, opacity: 0.8 }}>
-        {format.width} × {format.height}
-      </div>
+      {children}
     </div>
   );
 };

@@ -1,5 +1,7 @@
 import { Device, Screenshot } from '../Device';
 import { getFormat } from '../formats';
+import { Languages } from '../components/Languages';
+import { showcaseLanguages } from '../showcaseLanguages';
 import { Placeholder } from '../templates/Placeholder';
 
 const format = getFormat('play-feature-graphic');
@@ -9,7 +11,13 @@ export const PlayFeatureGraphic = () => (
     {(language) => (
       <>
         <Screenshot>
-          <Placeholder format={format} label={`${language} · 1`} />
+          <Placeholder format={format} label={`${language} · 1`}>
+            <Languages
+              languages={showcaseLanguages}
+              size={Math.min(format.width, format.height) * 0.14}
+              locale={language}
+            />
+          </Placeholder>
         </Screenshot>
       </>
     )}
